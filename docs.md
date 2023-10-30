@@ -54,14 +54,16 @@ Para ejecutar el proyecto, solo tienen que poner `npm run dev`
 
 La estructura del proyecto, es algo que puede ir variando según lo que vayamos viendo, pero la principal y la más importante ya está, que está basada en las recomendaciones de **********************Next.js 13********************** con el nuevo sistema de **App Router.** 
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/5142b49c-15ed-4cff-bcaf-c2a660b12103/ee605d78-4c79-49b7-b2ea-e85c2a99e563/Untitled.png)
+![image](https://github.com/dest92/epic-clash/assets/70166802/44806dd2-66a1-4ade-aa23-389fa1ab6201)
+
 
 - `.next`: Es la carpeta del caché de Next.
 - `node_modules`: Carpeta en la que se instalan todas las librerías y paquetes.
 - `public`: No presten atención a esta carpeta.
 - `next.config.js`: Configuración del entorno de Next. Si necesitan cambiar algo de esta configuración, consulten antes.
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/5142b49c-15ed-4cff-bcaf-c2a660b12103/0badc712-725d-4355-9cd7-7530c001e381/Untitled.png)
+![image](https://github.com/dest92/epic-clash/assets/70166802/8613cc3c-e3db-4031-b50e-f20093c62b84)
+
 
 Dentro de la carpeta app, que es en la que más vamos a trabajar, se encuentra lo siguiente:
 
@@ -71,7 +73,8 @@ Dentro de la carpeta app, que es en la que más vamos a trabajar, se encuentra l
 
 Como pueden ver, hay dos carpetas más que son **************config**************  y ************game.************ Estas carpetas representan las páginas de Next, por lo que les recomiendo que lean la documentación de Next.
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/5142b49c-15ed-4cff-bcaf-c2a660b12103/f771eb1f-cf58-4be7-a4a4-a1b59e638be4/Untitled.png)
+![image](https://github.com/dest92/epic-clash/assets/70166802/b31cba30-ec6a-46b6-bcd4-62ab1d498e15)
+
 
 [Routing: Pages and Layouts | Next.js (nextjs.org)](https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts)
 
