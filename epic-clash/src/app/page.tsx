@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
     <div className="fondo-juego min-h-screen flex justify-center items-center">
@@ -6,12 +8,15 @@ export default function Home() {
           <h1 className="text-white text-6xl font-bold font-8bit">
             Epic Clash
           </h1>
-          <p className="text-gray-300 font-8bit">
+          <p className="text-gray-300 font-8bit my-5">
             Lucha de guerreros y magos contra monstruos
           </p>
-          <button className="mt-5 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded font-8bit">
+          <Link
+            href="/game"
+            className="mt-20 bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded font-8bit"
+          >
             Jugar
-          </button>
+          </Link>
         </div>
       </div>
     </div>
