@@ -1,19 +1,26 @@
 import { Engine, Actor, Color, vec, Input } from "excalibur";
+import { Warrior, Mage, Monster, Weapon } from "./characters"; // Asegúrate de que las clases están correctamente importadas
 
 export const initializeGame = (canvasElement: HTMLCanvasElement) => {
+  // Tamaño fijo para el juego
+  const width = 800; // Ancho fijo
+  const height = 400; // Altura fija
+
   const game = new Engine({
     canvasElement: canvasElement,
-    width: 1920,
-    height: 600,
+    width: width,
+    height: height,
     backgroundColor: Color.Azure,
   });
 
+  // Crear un héroe (puede ser Warrior o Mage)
   const hero = new Actor({
-    pos: vec(100, 300),
+    pos: vec(100, height / 2),
     color: Color.Red,
     width: 50,
     height: 50,
   });
+  const heroCharacter = new Warrior(new Weapon(10)); // Aquí usamos Warrior, pero también podría ser Mage
 
   // Velocidad a la que se moverá el héroe
   const speed = 100;
@@ -34,24 +41,43 @@ export const initializeGame = (canvasElement: HTMLCanvasElement) => {
     hero.vel = vec(0, 0);
   });
 
+  // Crear monstruos y sus correspondientes actores
   const monsters = [
-    new Actor({
-      pos: vec(500, 300),
-      color: Color.Green,
-      width: 50,
-      height: 50,
-    }),
-    new Actor({
-      pos: vec(800, 300),
-      color: Color.Green,
-      width: 50,
-      height: 50,
-    }),
+    new Monster(50, new Weapon(5)),
+    new Monster(50, new Weapon(5)),
     // ... Añadir más monstruos si es necesario
   ];
 
+  const monsterActors = monsters.map(
+    (monster) =>
+      new Actor({
+        pos: vec(Math.random() * width, Math.random() * height), // Posición aleatoria dentro del canvas
+        color: Color.Green,
+        width: 50,
+        height: 50,
+      })
+  );
+
   game.add(hero);
-  monsters.forEach((monster) => game.add(monster));
+  monsterActors.forEach((monsterActor) => game.add(monsterActor));
+
+  // Lógica para atacar a un monstruo
+  game.input.keyboard.on("press", (evt) => {
+    if (evt.key === Input.Keys.C) {
+      console.log("Attacking monsters...");
+      monsterActors.forEach((monsterActor, index) => {
+        if (hero.pos.distance(monsterActor.pos) < 50) {
+          console.log(monsterActor.pos.distance(hero.pos));
+          heroCharacter.attack(monsters[index]); // El héroe ataca al monstruo
+          console.log(`Monster health: ${monsters[index].health}`);
+
+          if (monsters[index].health <= 0) {
+            monsterActor.color = Color.Gray; // Cambiar color si el monstruo muere
+          }
+        }
+      });
+    }
+  });
 
   return game;
 };
