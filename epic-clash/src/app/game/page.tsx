@@ -33,7 +33,11 @@ export const GamePage = () => {
   return (
     <>
       <Layout home={true} title about>
-        <canvas ref={canvasRef}></canvas>
+        <div className="flex justify-center items-center  fondo-about">
+          <div className="border-8  border-stone-900">
+            <canvas ref={canvasRef} className="align-middle"></canvas>
+          </div>
+        </div>
       </Layout>
     </>
   );
