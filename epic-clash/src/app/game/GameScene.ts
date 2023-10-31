@@ -1,27 +1,8 @@
-import { Engine, Actor, Color, vec, Scene, Input } from "excalibur";
+// GameScene.ts
+import { Actor, Color, vec, Scene, Engine, Input } from "excalibur";
 import { Warrior, Mage, Monster, Weapon } from "./characters"; // Asegúrate de que las clases están correctamente importadas
 
-class MainMenuScene extends Scene {
-  onInitialize(engine: Engine) {
-    const playButton = new Actor({
-      pos: vec(engine.halfDrawWidth, engine.halfDrawHeight),
-      width: 100, // Ancho del botón
-      height: 40, // Altura del botón
-      color: Color.Gray, // Color del botón
-    });
-
-    playButton.on("pointerup", () => {
-      engine.goToScene("game");
-    });
-
-    // Habilitar la captura de eventos de puntero para el botón de Play
-    playButton.enableCapturePointer = true;
-
-    this.add(playButton);
-  }
-}
-
-class GameScene extends Scene {
+export class GameScene extends Scene {
   onInitialize(engine: Engine) {
     // Crear un héroe (puede ser Warrior o Mage)
     const hero = new Actor({
@@ -93,25 +74,3 @@ class GameScene extends Scene {
     });
   }
 }
-
-export const initializeGame = (canvasElement: HTMLCanvasElement) => {
-  const game = new Engine({
-    canvasElement: canvasElement,
-    width: 800,
-    height: 400,
-    backgroundColor: Color.Azure,
-  });
-
-  // Agregar escenas al juego
-  game.add("menu", new MainMenuScene());
-  game.add("game", new GameScene());
-
-  // Iniciar con el menú principal
-  game.goToScene("menu");
-
-  return game;
-};
-
-export const startGame = (game: Engine) => {
-  game.start();
-};
