@@ -3,6 +3,7 @@ import React, { useRef, useEffect } from "react";
 import { Engine } from "excalibur";
 import { initializeGame, startGame } from "./game";
 import Link from "next/link";
+import Layout from "../components/layout";
 
 export const GamePage = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -31,8 +32,9 @@ export const GamePage = () => {
 
   return (
     <>
-      <Link href="/">Home</Link>
-      <canvas ref={canvasRef}></canvas>
+      <Layout home={true} title about>
+        <canvas ref={canvasRef}></canvas>
+      </Layout>
     </>
   );
 };
