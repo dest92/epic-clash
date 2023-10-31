@@ -24,9 +24,17 @@ export class MainMenuScene extends Scene {
     });
 
     background.graphics.use(Images.backgroundImage.toSprite());
-    
+
     engine.start(loader);
 
+    const text = new Text({
+      text: "EPIC CLASH",
+      color: Color.Orange,
+      font: new Font({ size: 48, unit: FontUnit.Px, family: "PressStart2P" }),
+    });
+
+    const actorText = new Actor({ pos: vec(engine.halfDrawWidth, 150) });
+    actorText.graphics.add(text);
 
     const playButton = new Actor({
       pos: vec(engine.halfDrawWidth, engine.halfDrawHeight),
@@ -35,12 +43,20 @@ export class MainMenuScene extends Scene {
       color: Color.Gray, // Color del botón
     });
 
+    // Habilitar la captura de eventos de puntero para el botón de Play
+    playButton.enableCapturePointer = true;
+
+    playButton.on("pointerenter", () => {
+      playButton.color = Color.Yellow;
+    });
+
+    playButton.on("pointerleave", () => {
+      playButton.color = Color.Gray;
+    });
+
     playButton.on("pointerup", () => {
       engine.goToScene("game");
     });
-
-    // Habilitar la captura de eventos de puntero para el botón de Play
-    playButton.enableCapturePointer = true;
 
     const label = new Label({
       font: new Font({
@@ -57,5 +73,6 @@ export class MainMenuScene extends Scene {
     this.add(background);
     this.add(playButton);
     this.add(label);
+    this.add(actorText);
   }
 }
