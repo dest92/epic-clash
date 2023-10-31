@@ -29,6 +29,12 @@
   background-position: center;
 }
 
+.fondo-about {
+  background-image: url("assets/images/aboutBackground.png");
+  background-size: cover;
+  background-position: center;
+}
+
 .font-8bit {
   font-family: "PressStart2P", cursive;
 }

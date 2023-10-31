@@ -1,9 +1,17 @@
 import Link from "next/link";
 import Layout from "./components/layout";
+import Head from "next/head";
 
+export const metadata = {
+  title: "Total Games | Inicio",
+};
 export default function Home() {
   return (
     <>
+      <Head>
+        <title>Total Games | Inicio</title>
+        <meta name="description" content="Total Games" />
+      </Head>
       <Layout about={true}>
         <div className="fondo-juego min-h-screen flex justify-center items-center">
           <div className="bg-transparent min-h-screen flex justify-center items-center">
@@ -16,7 +24,7 @@ export default function Home() {
               </p>
               <Link
                 href="/game"
-                className="mt-20 bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded font-8bit"
+                className="mt-20 bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded font-8bit animate-pulse"
               >
                 Jugar
               </Link>
