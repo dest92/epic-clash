@@ -11,6 +11,7 @@ export const initializeGame = (canvasElement: HTMLCanvasElement) => {
     backgroundColor: Color.Azure,
     suppressPlayButton: true,
     suppressConsoleBootMessage: true,
+    antialiasing: false,
   });
 
   // Agregar escenas al juego
