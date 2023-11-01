@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Layout from "./components/layout";
-import Head from "next/head";
 
 export const metadata = {
   title: "Total Games | Inicio",
@@ -8,10 +7,6 @@ export const metadata = {
 export default function Home() {
   return (
     <>
-      <Head>
-        <title>Total Games | Inicio</title>
-        <meta name="description" content="Total Games" />
-      </Head>
       <Layout about={true}>
         <div className="fondo-juego min-h-screen flex justify-center items-center">
           <div className="bg-transparent min-h-screen flex justify-center items-center">
@@ -35,5 +30,3 @@ export default function Home() {
     </>
   );
 }
-
-

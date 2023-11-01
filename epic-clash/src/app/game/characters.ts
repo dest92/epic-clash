@@ -10,64 +10,77 @@ export class Weapon implements IWeapon {
 
 // Interfaz para los personajes en general
 export interface ICharacter {
+  name: string;
   health: number;
   weapon?: Weapon;
-  attack(target: ICharacter): void;
+  attack(target: ICharacter): number;
+  hasWeapon(): boolean;
 }
 
 // Interfaz para los héroes
 export interface IHero extends ICharacter {
-  health: number;
-  weapon?: Weapon;
-  dropWeapon(): Weapon | undefined; // Cambiado a Weapon | undefined
+  dropWeapon(): Weapon | undefined;
 }
 
 // Interfaz para los monstruos
 export interface IMonster extends ICharacter {
-  dropWeapon(): Weapon | undefined; // Cambiado a Weapon | undefined
+  dropWeapon(): Weapon | undefined;
 }
 
 // Clase abstracta Hero
 export abstract class Hero implements IHero {
+  name: string;
   health: number = 100;
   weapon?: Weapon;
 
-  constructor(weapon?: Weapon) {
+  constructor(name: string, weapon?: Weapon) {
+    this.name = name;
     this.weapon = weapon;
   }
 
-  abstract attack(target: ICharacter): void;
+  abstract attack(target: ICharacter): number;
 
   dropWeapon(): Weapon | undefined {
-    // Cambiado a Weapon | undefined
     const droppedWeapon = this.weapon;
     this.weapon = undefined;
     return droppedWeapon;
+  }
+
+  hasWeapon(): boolean {
+    return this.weapon !== undefined;
   }
 }
 
 // Clase Warrior
 export class Warrior extends Hero {
-  attack(target: ICharacter): void {
-    const damage = this.weapon ? this.weapon.damage * 3 : 0;
+  attack(target: ICharacter): number {
+    const damage = this.hasWeapon() ? this.weapon!.damage * 3 : 1;
     target.health -= damage;
+    return damage;
   }
 }
 
 // Clase Mage
 export class Mage extends Hero {
-  attack(target: ICharacter): void {
-    const damage = 20;
+  attack(target: ICharacter): number {
+    const damage = this.hasWeapon() ? 20 : 1;
     target.health -= damage;
+    return damage;
   }
 }
 
 // Clase Monster
 export class Monster implements IMonster {
-  constructor(public health: number, public weapon: Weapon = new Weapon(1)) {}
+  name: string;
 
-  attack(target: ICharacter): void {
-    target.health -= this.weapon.damage;
+  constructor(name: string, public health: number, public weapon: Weapon = new Weapon(1)) {
+    this.name = name;
+  }
+
+  attack(target: ICharacter): number {
+    const damage = this.hasWeapon() ? this.weapon.damage : 1;
+    target.health -= damage;
+    return damage;
   }
 
   dropWeapon(): Weapon | undefined {
@@ -77,5 +90,9 @@ export class Monster implements IMonster {
       return droppedWeapon;
     }
     return undefined;
+  }
+
+  hasWeapon(): boolean {
+    return this.weapon.damage > 1;
   }
 }
