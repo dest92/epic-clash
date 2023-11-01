@@ -1,8 +1,8 @@
 "use client";
 import React, { useRef, useEffect } from "react";
 import { Engine } from "excalibur";
-import { initializeGame, startGame } from "./game";
-import Link from "next/link";
+import { initializeGame, startGame } from "./main";
+import Layout from "../components/layout";
 
 export const GamePage = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -31,8 +31,15 @@ export const GamePage = () => {
 
   return (
     <>
-      <Link href="/">Home</Link>
-      <canvas ref={canvasRef}></canvas>
+      <div className=" fondo-about">
+        <Layout home={true} title about>
+          <div className="flex justify-center items-center mt-10">
+            <div className="border-8  border-stone-900">
+              <canvas ref={canvasRef} className="align-middle"></canvas>
+            </div>
+          </div>
+        </Layout>
+      </div>
     </>
   );
 };
