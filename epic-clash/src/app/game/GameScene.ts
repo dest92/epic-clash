@@ -23,7 +23,7 @@ export class GameScene extends Scene {
         height: 50,
       });
 
-      console.log(character.hasWeapon() ? "Has weapon" : "No weapon");
+      console.log(character);
 
       if (character instanceof Monster) {
         this.monsters.push(actor);

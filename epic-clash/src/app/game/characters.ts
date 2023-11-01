@@ -10,6 +10,7 @@ export class Weapon implements IWeapon {
 
 // Interfaz para los personajes en general
 export interface ICharacter {
+  name: string;
   health: number;
   weapon?: Weapon;
   attack(target: ICharacter): number;
@@ -28,10 +29,12 @@ export interface IMonster extends ICharacter {
 
 // Clase abstracta Hero
 export abstract class Hero implements IHero {
+  name: string;
   health: number = 100;
   weapon?: Weapon;
 
-  constructor(weapon?: Weapon) {
+  constructor(name: string, weapon?: Weapon) {
+    this.name = name;
     this.weapon = weapon;
   }
 
@@ -68,7 +71,11 @@ export class Mage extends Hero {
 
 // Clase Monster
 export class Monster implements IMonster {
-  constructor(public health: number, public weapon: Weapon = new Weapon(1)) {}
+  name: string;
+
+  constructor(name: string, public health: number, public weapon: Weapon = new Weapon(1)) {
+    this.name = name;
+  }
 
   attack(target: ICharacter): number {
     const damage = this.hasWeapon() ? this.weapon.damage : 1;
