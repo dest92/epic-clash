@@ -1,4 +1,3 @@
-import Head from "next/head";
 import Layout from "../components/layout"; // Asegúrate de ajustar la ruta del importe si es necesario
 
 export const metadata = {
@@ -7,10 +6,6 @@ export const metadata = {
 const About = () => {
   return (
     <>
-      <Head>
-        <title>Total Games | Acerca de</title>
-        <meta name="description" content="Acerca de Total Games" />
-      </Head>
       <Layout home play title>
         <main className="fondo-about min-h-screen flex flex-col items-center bg-black text-white font-8bit">
           <section className="container mx-auto p-8">

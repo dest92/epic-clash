@@ -1,72 +1,89 @@
 // GameScene.ts
 import { Actor, Color, vec, Scene, Engine, Input } from "excalibur";
-import { Warrior, Mage, Monster, Weapon } from "./characters"; // Asegúrate de que las clases están correctamente importadas
+import { Warrior, Mage, Monster, Weapon, ICharacter } from "./characters";
+import { createCharacters } from "./actors";
 
 export class GameScene extends Scene {
+  private hero: Actor | null = null;
+  private heroCharacter: ICharacter | null = null;
+  private monsters: Actor[] = [];
+  private monsterCharacters: ICharacter[] = [];
+
   onInitialize(engine: Engine) {
-    // Crear un héroe (puede ser Warrior o Mage)
-    const hero = new Actor({
-      pos: vec(100, engine.drawHeight / 2),
-      color: Color.Red,
-      width: 50,
-      height: 50,
+    const characters = createCharacters(1, 1); // 1 héroe y 3 monstruos
+
+    characters.forEach((character) => {
+      const actor = new Actor({
+        pos: vec(
+          Math.random() * engine.drawWidth,
+          Math.random() * engine.drawHeight
+        ),
+        color: character instanceof Monster ? Color.Green : Color.Red,
+        width: 50,
+        height: 50,
+      });
+
+      console.log(character.hasWeapon() ? "Has weapon" : "No weapon");
+
+      if (character instanceof Monster) {
+        this.monsters.push(actor);
+        this.monsterCharacters.push(character);
+      } else {
+        this.hero = actor;
+        this.heroCharacter = character;
+      }
+
+      this.add(actor);
     });
-    const heroCharacter = new Warrior(new Weapon(10)); // Aquí usamos Warrior, pero también podría ser Mage
 
     // Velocidad a la que se moverá el héroe
     const speed = 100;
 
     engine.input.keyboard.on("hold", (evt) => {
-      if (evt.key === Input.Keys.W) {
-        hero.vel = vec(0, -speed);
-      } else if (evt.key === Input.Keys.S) {
-        hero.vel = vec(0, speed);
-      } else if (evt.key === Input.Keys.A) {
-        hero.vel = vec(-speed, 0);
-      } else if (evt.key === Input.Keys.D) {
-        hero.vel = vec(speed, 0);
+      if (this.hero && evt.key === Input.Keys.W) {
+        this.hero.vel = vec(0, -speed);
+      } else if (this.hero && evt.key === Input.Keys.S) {
+        this.hero.vel = vec(0, speed);
+      } else if (this.hero && evt.key === Input.Keys.A) {
+        this.hero.vel = vec(-speed, 0);
+      } else if (this.hero && evt.key === Input.Keys.D) {
+        this.hero.vel = vec(speed, 0);
       }
     });
 
     engine.input.keyboard.on("release", () => {
-      hero.vel = vec(0, 0);
+      if (this.hero) {
+        this.hero.vel = vec(0, 0);
+      }
     });
 
-    // Crear monstruos y sus correspondientes actores
-    const monsters = [
-      new Monster(50, new Weapon(5)),
-      new Monster(50, new Weapon(5)),
-      // ... Añadir más monstruos si es necesario
-    ];
-
-    const monsterActors = monsters.map(
-      (monster) =>
-        new Actor({
-          pos: vec(
-            Math.random() * engine.drawWidth,
-            Math.random() * engine.drawHeight
-          ), // Posición aleatoria dentro del canvas
-          color: Color.Green,
-          width: 50,
-          height: 50,
-        })
-    );
-
-    this.add(hero);
-    monsterActors.forEach((monsterActor) => this.add(monsterActor));
-
+    // Lógica para atacar a un monstruo
     // Lógica para atacar a un monstruo
     engine.input.keyboard.on("press", (evt) => {
       if (evt.key === Input.Keys.C) {
         console.log("Attacking monsters...");
-        monsterActors.forEach((monsterActor, index) => {
-          if (hero.pos.distance(monsterActor.pos) < 50) {
-            console.log(monsterActor.pos.distance(hero.pos));
-            heroCharacter.attack(monsters[index]); // El héroe ataca al monstruo
-            console.log(`Monster health: ${monsters[index].health}`);
+        this.monsters.forEach((monsterActor, index) => {
+          console.log(
+            `Monster health: ${this.monsterCharacters[index].health}`
+          );
+          // Asegúrate de que tanto hero como heroCharacter no sean null antes de usarlos
+          if (
+            this.hero &&
+            this.heroCharacter &&
+            this.hero.pos.distance(monsterActor.pos) < 50
+          ) {
+            const damage = this.heroCharacter.attack(
+              this.monsterCharacters[index]
+            );
 
-            if (monsters[index].health <= 0) {
-              monsterActor.color = Color.Gray; // Cambiar color si el monstruo muere
+            // Muestra el daño causado en la consola
+            console.log(`Damage caused: ${damage}`);
+            console.log(
+              `${index} Monster health: ${this.monsterCharacters[index].health}`
+            );
+
+            if (this.monsterCharacters[index].health <= 0) {
+              monsterActor.color = Color.Gray;
             }
           }
         });
