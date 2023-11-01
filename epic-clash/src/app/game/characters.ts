@@ -54,7 +54,7 @@ export abstract class Hero implements IHero {
 // Clase Warrior
 export class Warrior extends Hero {
   attack(target: ICharacter): number {
-    const damage = this.hasWeapon() ? this.weapon!.damage * 3 : 1;
+    const damage = this.hasWeapon() ? this.weapon!.damage * 3 : 0;
     target.health -= damage;
     return damage;
   }
@@ -73,7 +73,11 @@ export class Mage extends Hero {
 export class Monster implements IMonster {
   name: string;
 
-  constructor(name: string, public health: number, public weapon: Weapon = new Weapon(1)) {
+  constructor(
+    name: string,
+    public health: number,
+    public weapon: Weapon = new Weapon(1)
+  ) {
     this.name = name;
   }
 
