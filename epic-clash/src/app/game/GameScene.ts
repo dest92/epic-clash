@@ -8,6 +8,9 @@ export class GameScene extends Scene {
   private currentHeroIndex: number = 0; // Índice del héroe actualmente seleccionado
   private monsters: Actor[] = [];
   private monsterCharacters: ICharacter[] = [];
+  private currentMonsterIndex: number = 0; // Índice del héroe actualmente seleccionado
+  private currentActor: Actor | null = null; // The actor that currently has control
+  private currentTurn: boolean = true; // true for heroes' turn, false for monsters' turn
 
   onInitialize(engine: Engine) {
     const characters = createCharacters(2, 1); // 10 héroes y 1 monstruo
@@ -32,60 +35,78 @@ export class GameScene extends Scene {
       }
 
       this.add(actor);
+      this.currentTurn = true; // Start the heroes' turn
+      this.currentActor = this.heroes[0]; // Start with the first hero
     });
 
     // Velocidad a la que se moverán los héroes
-    const speed = 100;
+    const speed = 80;
 
     engine.input.keyboard.on("hold", (evt) => {
-      const currentHero = this.heroes[this.currentHeroIndex];
-      if (!currentHero) return;
+      // if (this.currentTurn) { // Only allow heroes to perform actions on their turn
 
-      if (evt.key === Input.Keys.W) {
-        currentHero.vel = vec(0, -speed);
-      } else if (evt.key === Input.Keys.S) {
-        currentHero.vel = vec(0, speed);
-      } else if (evt.key === Input.Keys.A) {
-        currentHero.vel = vec(-speed, 0);
-      } else if (evt.key === Input.Keys.D) {
-        currentHero.vel = vec(speed, 0);
-      }
+        const currentActor = this.currentActor;
+        if (!currentActor) return;
+
+        if (evt.key === Input.Keys.W) {
+          currentActor.vel = vec(0, -speed);
+        } else if (evt.key === Input.Keys.S) {
+          currentActor.vel = vec(0, speed);
+        } else if (evt.key === Input.Keys.A) {
+          currentActor.vel = vec(-speed, 0);
+        } else if (evt.key === Input.Keys.D) {
+          currentActor.vel = vec(speed, 0);
+        }
+
     });
 
-    engine.input.keyboard.on("release", () => {
-      const currentHero = this.heroes[this.currentHeroIndex];
-      if (currentHero) {
-        currentHero.vel = vec(0, 0);
-      }
-    });
-
-    // Cambiar entre héroes
+    // engine.input.keyboard.on("release", () => {
+    //   if (this.currentTurn) { // Only allow heroes to perform actions on their turn
+    //     const currentHero = this.heroes[this.currentHeroIndex];
+    //     if (currentHero) {
+    //       currentHero.vel = vec(0, 0);
+    //     }
+    //   }a
+    // });
     engine.input.keyboard.on("press", (evt) => {
-      if (evt.key === Input.Keys.Left) {
-        this.currentHeroIndex = (this.currentHeroIndex - 1 + this.heroes.length) % this.heroes.length;
-      } else if (evt.key === Input.Keys.Right) {
-        this.currentHeroIndex = (this.currentHeroIndex + 1) % this.heroes.length;
-      }
-
-      // Lógica para atacar a un monstruo
-      if (evt.key === Input.Keys.C) {
-        console.log("Attacking monsters...");
-        this.monsters.forEach((monsterActor, index) => {
-          const currentHeroCharacter = this.heroCharacters[this.currentHeroIndex];
-          if (!currentHeroCharacter) return;
-
-          console.log(`Monster health: ${this.monsterCharacters[index].health}`);
-          if (this.heroes[this.currentHeroIndex].pos.distance(monsterActor.pos) < 50) {
-            const damage = currentHeroCharacter.attack(this.monsterCharacters[index]);
-            console.log(`Damage caused: ${damage}`);
-            console.log(`${index} Monster health: ${this.monsterCharacters[index].health}`);
-
-            if (this.monsterCharacters[index].health <= 0) {
-              monsterActor.color = Color.Gray;
-            }
-          }
-        });
+      if (evt.key === Input.Keys.F) { // Press F to end turn
+        this.changeTurn();
       }
     });
+
+
   }
+  update(engine: Engine, delta: number) {
+    super.update(engine, delta);
+   
+    // Actualiza el actor activo
+    const currentActor = this.currentTurn ? this.heroes[this.currentHeroIndex] : this.monsters[this.currentMonsterIndex];
+    if (currentActor) {
+    currentActor.rotation = 1
+  
+    }
+   }
+     
+  changeTurn() {
+    // Desactiva al actor actual sin cambiar su estado
+    if (this.currentActor) {
+      this.currentActor.active = false;
+    }
+  
+    // Cambia al siguiente actor (héroe o monstruo) y alterna el tipo
+    if (this.currentActor === this.heroes[this.currentHeroIndex]) {
+      this.currentHeroIndex = (this.currentHeroIndex + 1) % this.heroes.length;
+      this.currentActor = this.monsters[this.currentMonsterIndex];
+    } else {
+      this.currentActor = this.heroes[this.currentHeroIndex];
+    }
+  
+    // Activa al nuevo actor
+    this.currentActor.active 
+  
+    // Cambia el turno
+    this.currentTurn = !this.currentTurn;
+  }
+  
+  
 }
