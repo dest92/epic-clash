@@ -60,14 +60,6 @@ export class GameScene extends Scene {
 
     });
 
-    // engine.input.keyboard.on("release", () => {
-    //   if (this.currentTurn) { // Only allow heroes to perform actions on their turn
-    //     const currentHero = this.heroes[this.currentHeroIndex];
-    //     if (currentHero) {
-    //       currentHero.vel = vec(0, 0);
-    //     }
-    //   }a
-    // });
     engine.input.keyboard.on("press", (evt) => {
       if (evt.key === Input.Keys.F) { // Press F to end turn
         this.changeTurn();
@@ -78,21 +70,20 @@ export class GameScene extends Scene {
   }
   update(engine: Engine, delta: number) {
     super.update(engine, delta);
-   
+
     // Actualiza el actor activo
+
     const currentActor = this.currentTurn ? this.heroes[this.currentHeroIndex] : this.monsters[this.currentMonsterIndex];
     if (currentActor) {
-    currentActor.rotation = 1
-  
+        currentActor.rotation = 1;
+        const target = this.currentTurn ? this.monsters[this.currentMonsterIndex] : this.heroes[this.currentHeroIndex];
+        if (target) {
+            currentActor.attack(target);
+        }
     }
    }
      
   changeTurn() {
-    // Desactiva al actor actual sin cambiar su estado
-    if (this.currentActor) {
-      this.currentActor.active = false;
-    }
-  
     // Cambia al siguiente actor (héroe o monstruo) y alterna el tipo
     if (this.currentActor === this.heroes[this.currentHeroIndex]) {
       this.currentHeroIndex = (this.currentHeroIndex + 1) % this.heroes.length;
@@ -101,12 +92,10 @@ export class GameScene extends Scene {
       this.currentActor = this.heroes[this.currentHeroIndex];
     }
   
-    // Activa al nuevo actor
-    this.currentActor.active 
+    //Activa al nuevo actor
+    this.currentActor.active = true
   
     // Cambia el turno
     this.currentTurn = !this.currentTurn;
   }
-  
-  
 }
