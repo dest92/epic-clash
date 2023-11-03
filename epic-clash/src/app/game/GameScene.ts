@@ -61,7 +61,46 @@ export class GameScene extends Scene {
     });
 
     engine.input.keyboard.on("press", (evt) => {
+          // Lógica para atacar a un monstruo
+          if (evt.key === Input.Keys.C) {
+            console.log("Attacking monsters...");
+            this.monsters.forEach((monsterActor, index) => {
+              const currentHeroCharacter = this.heroCharacters[this.currentHeroIndex];
+              if (!currentHeroCharacter) return;
+    
+              console.log(`Monster health: ${this.monsterCharacters[index].health}`);
+              
+                const damage = currentHeroCharacter.attack(this.monsterCharacters[index]);
+                console.log(`Damage caused: ${damage}`);
+                console.log(`${index} Monster health: ${this.monsterCharacters[index].health}`);
+    
+                if (this.monsterCharacters[index].health <= 0) {
+                  monsterActor.color = Color.Gray;
+                }
+              
+            });
+          } 
+                 // Lógica para atacar a un heroe
+                 if (evt.key === Input.Keys.V) {
+                  console.log("Attacking hero...");
+                  this.heroes.forEach((heroesActor, index) => {
+                    const currentMonsterCharacter = this.monsterCharacters[this.currentMonsterIndex];
+                    if (!currentMonsterCharacter) return;
+          
+                    console.log(`Hero health: ${this.heroCharacters[index].health}`);
+                    
+                      const damage = currentMonsterCharacter.attack(this.heroCharacters[index]);
+                      console.log(`Damage caused: ${damage}`);
+                      console.log(`${index} Hero health: ${this.heroCharacters[index].health}`);
+          
+                      if (this.heroCharacters[index].health <= 0) {
+                        heroesActor.color = Color.Gray;
+                      }
+                    
+                  });
+                } 
       if (evt.key === Input.Keys.F) { // Press F to end turn
+        console.log("Turn Change...");
         this.changeTurn();
       }
     });
@@ -76,10 +115,7 @@ export class GameScene extends Scene {
     const currentActor = this.currentTurn ? this.heroes[this.currentHeroIndex] : this.monsters[this.currentMonsterIndex];
     if (currentActor) {
         currentActor.rotation = 1;
-        const target = this.currentTurn ? this.monsters[this.currentMonsterIndex] : this.heroes[this.currentHeroIndex];
-        if (target) {
-            currentActor.attack(target);
-        }
+       
     }
    }
      
