@@ -174,33 +174,40 @@ export class GameScene extends Scene {
     this.heroes.map((currentHero, index) => {
       const currentHeroCharacter = this.heroCharacters[index];
       if (!currentHero || !currentHeroCharacter) return;
-   
+
       console.log(`-> ${currentHeroCharacter.name}${index} is attacking...`);
-   
+
       // Genera un índice aleatorio para seleccionar un monstruo al azar
       const randomIndex = Math.floor(Math.random() * this.monsters.length);
-   
+
       const monsterActor = this.monsters[randomIndex];
       const monsterCharacter = this.monsterCharacters[randomIndex];
-   
+
       const damage = currentHeroCharacter.attack(monsterCharacter);
-      console.log(`${monsterCharacter.name} ${this.currentMonsterIndex} being attacked`);
+      console.log(
+        `${monsterCharacter.name} ${this.currentMonsterIndex} being attacked`
+      );
       console.log(`Damage caused: ${damage}`);
       console.log(`Monster health: ${monsterCharacter.health}`);
       if (monsterCharacter.health <= 0) {
         monsterActor.color = Color.Gray;
+        monsterActor.kill();
+        if (monsterActor.isKilled()) {
+          this.monsters.splice(randomIndex, 1);
+          this.monsterCharacters.splice(randomIndex, 1);
+          console.log("monsters alive " + this.monsterCharacters.length);
+        }
       }
     });
-   
+
     this.changeTurn();
     this.scheduleMonsterAttack();
-   }
-   
+  }
 
   performMonsterAttack() {
-  console.log("-----Monster turn-----");
+    console.log("-----Monster turn-----");
 
-  this.monsterCharacters.map((currentMonsterCharacter) => {
+    this.monsterCharacters.map((currentMonsterCharacter) => {
       if (!currentMonsterCharacter) return;
 
       console.log(`->${currentMonsterCharacter.name} is attacking...`);
@@ -216,11 +223,16 @@ export class GameScene extends Scene {
       console.log(`Damage caused: ${damage}`);
       console.log(`Hero health: ${heroCharacter.health}`);
       if (heroCharacter.health <= 0) {
-          heroActor.color = Color.Gray;
+        heroActor.color = Color.Gray;
+        heroActor.kill();
+        if (heroActor.isKilled()) {
+          this.heroes.splice(randomIndex, 1);
+          this.heroCharacters.splice(randomIndex, 1);
+          console.log("heros alive " + this.heroCharacters.length);
+        }
       }
-  });
+    });
 
-  this.changeTurn();
-}
-
+    this.changeTurn();
+  }
 }
