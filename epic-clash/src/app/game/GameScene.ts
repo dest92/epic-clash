@@ -50,10 +50,29 @@ export class GameScene extends Scene {
           const damage = currentHeroCharacter.attack(
             this.monsterCharacters[index]
           );
-          console.log(`Damage caused: ${damage}`);
+          console.log(
+            `${currentHeroCharacter.name} Causó: ${damage} de daño a  ${this.monsterCharacters[index].name} }`
+          );
+          const labelmessage = new Label({
+            font: new Font({
+              family: "PressStart2P",
+              size: 5,
+              unit: FontUnit.Px,
+              textAlign: TextAlign.Center,
+            }),
+            text: `${currentHeroCharacter.name} Causó: ${damage} de daño a  ${this.monsterCharacters[index].name} }`,
+            pos: vec(engine.halfDrawWidth, engine.halfDrawHeight),
+            color: Color.Black,
+          });
           console.log(
             `${index} Monster health: ${this.monsterCharacters[index].health}`
           );
+
+          this.add(labelmessage);
+
+          setTimeout(() => { 
+            labelmessage.kill();
+           }, 5000);
 
           if (this.monsterCharacters[index].health <= 0) {
             monsterActor.color = Color.Gray;
