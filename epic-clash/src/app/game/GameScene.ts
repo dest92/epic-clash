@@ -38,7 +38,6 @@ export class GameScene extends Scene {
       this.add(actor);
       this.currentTurn = true; // Start the heroes' turn
       this.currentActor = this.heroes[0]; // Start with the first hero
-      // this.actorQueue.push(actor);
     });
 
     // Velocidad a la que se moverán los héroes
@@ -46,37 +45,18 @@ export class GameScene extends Scene {
 
 
     engine.input.keyboard.on("press", (evt) => {
-      // Lógica para atacar a un monstruo
+      // Lógica para atacar a un monstruo con la tecla "C"
       if (evt.key === Input.Keys.C) {
-        // console.log("Attacking monsters...");
-        // this.monsters.forEach((monsterActor, index) => {
-        //   const currentHeroCharacter = this.heroCharacters[this.currentHeroIndex];
-        //   if (!currentHeroCharacter) return;
 
-        //   console.log(`Monster health: ${this.monsterCharacters[index].health}`);
-          
-        //     const damage = currentHeroCharacter.attack(this.monsterCharacters[index]);
-        //     monsterActor.color = Color.LightGray;
-        //     console.log(`Damage caused: ${damage}`);
-        //     console.log(`${index} Monster health: ${this.monsterCharacters[index].health}`);
-
-        //     if (this.monsterCharacters[index].health <= 0) {
-        //       monsterActor.color = Color.Gray;
-        //     }
-          
-        // });
         if (this.currentTurn) {
           this.performHeroAttack();
          } else {
           this.performMonsterAttack();
          }
-         
       } 
-      // this.changeTurn();
     });
 
     engine.input.keyboard.on("hold", (evt) => {
-      // if (this.currentTurn) { // Only allow heroes to perform actions on their turn
 
         const currentActor = this.currentActor;
         if (!currentActor) return;
@@ -93,37 +73,13 @@ export class GameScene extends Scene {
 
     });
 
-    engine.input.keyboard.on("release", () => {
-
-      // // The Monster Attacks 
-      // console.log("Attacking hero...");
-      // this.heroes.forEach((heroesActor, index) => {
-      //   const currentMonsterCharacter = this.monsterCharacters[this.currentMonsterIndex];
-      //   if (!currentMonsterCharacter) return;
-
-      //   console.log(`Hero health: ${this.heroCharacters[index].health}`);
-        
-      //     const damage = currentMonsterCharacter.attack(this.heroCharacters[0]);
-          
-      //     console.log(`Damage caused: ${damage}`);
-      //     console.log(`${index} Hero health: ${this.heroCharacters[0].health}`);
-
-      //     if (this.heroCharacters[index].health <= 0) {
-      //       heroesActor.color = Color.Gray;
-      //     }
-        
-      // });
-      // this.changeTurn();
-
-    });
-
+    // engine.input.keyboard.on("release", () => {
+    // });
   }
 
 
   update(engine: Engine, delta: number) {
     super.update(engine, delta);
-
-    // const currentActor = this.currentTurn ? this.heroes[this.currentHeroIndex] : this.monsters[this.currentMonsterIndex];
 
      //If it's the current actor's turn
     if (this.currentActor) {
@@ -152,48 +108,54 @@ export class GameScene extends Scene {
     this.currentTurn = !this.currentTurn;
    }
    
-  performHeroAttack() {
-    console.log("*******Hero is attacking...");
-    console.log("Attacking Monster...");
+   performHeroAttack() {
     const currentHero = this.heroes[this.currentHeroIndex];
     const currentHeroCharacter = this.heroCharacters[this.currentHeroIndex];
     if (!currentHero || !currentHeroCharacter) return;
-
-    this.monsters.forEach((monsterActor, index) => {
-        const damage = currentHeroCharacter.attack(this.monsterCharacters[index]);
-        console.log(`Damage caused: ${damage}`);
-        console.log(`Monster health: ${this.monsterCharacters[index].health}`);
-        if (this.monsterCharacters[index].health <= 0) {
-          monsterActor.color = Color.Gray;
-        }
-    });
-
-
+   
+    console.log(`->Hero ${this.currentHeroIndex} is attacking...`);
+    
+    // Genera un índice aleatorio para seleccionar un monstruo al azar
+    const randomIndex = Math.floor(Math.random() * this.monsters.length);
+   
+    const monsterActor = this.monsters[randomIndex];
+    const monsterCharacter = this.monsterCharacters[randomIndex];
+   
+    const damage = currentHeroCharacter.attack(monsterCharacter);
+    console.log(`Monster ${monsterCharacter.name} being attacked`);
+    console.log(`Damage caused: ${damage}`);
+    console.log(`Monster health: ${monsterCharacter.health}`);
+    if (monsterCharacter.health <= 0) {
+      monsterActor.color = Color.Gray;
+    }
+   
     this.changeTurn()
-  }
+   }
+   
 
-  performMonsterAttack() {
-    console.log("Monster is attacking...");
-         // The Monster Attacks 
-      console.log("Attacking hero...");
-      this.heroes.forEach((heroesActor, index) => {
-        const currentMonsterCharacter = this.monsterCharacters[this.currentMonsterIndex];
-        if (!currentMonsterCharacter) return;
-
-        console.log(`Hero health: ${this.heroCharacters[index].health}`);
-        
-          const damage = currentMonsterCharacter.attack(this.heroCharacters[0]);
-          
-          console.log(`Damage caused: ${damage}`);
-          console.log(`${index} Hero health: ${this.heroCharacters[0].health}`);
-
-          if (this.heroCharacters[index].health <= 0) {
-            heroesActor.color = Color.Gray;
-          }
-        
-      });
-
-
+   performMonsterAttack() {
+    console.log("-----Monster turn-----");
+    
+    const currentMonsterCharacter = this.monsterCharacters[this.currentMonsterIndex];
+    if (!currentMonsterCharacter) return;
+   
+    console.log(`->Monster ${this.currentMonsterIndex} is attacking...`);
+    
+    // Genera un índice aleatorio para seleccionar un héroe al azar
+    const randomIndex = Math.floor(Math.random() * this.heroes.length);
+   
+    const heroActor = this.heroes[randomIndex];
+    const heroCharacter = this.heroCharacters[randomIndex];
+   
+    const damage = currentMonsterCharacter.attack(heroCharacter);
+    console.log(`Hero ${heroCharacter.name} being attacked`);
+    console.log(`Damage caused: ${damage}`);
+    console.log(`Hero health: ${heroCharacter.health}`);
+    if (heroCharacter.health <= 0) {
+     heroActor.color = Color.Gray;
+    }
+   
     this.changeTurn()
-  }
+   }
+   
 }
