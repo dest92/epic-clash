@@ -84,9 +84,6 @@ export class GameScene extends Scene {
         }
 
     });
-
-    // engine.input.keyboard.on("release", () => {
-    // });
   }
 
 
