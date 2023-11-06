@@ -1,5 +1,5 @@
 import { Actor, Color, vec, Scene, Engine, Input } from "excalibur";
-import { Warrior, Mage, Monster, Weapon, ICharacter } from "./characters";
+import { Warrior, Mage, Monster, Weapon, ICharacter, Hero } from "./characters";
 import { createCharacters } from "./actors";
 
 export class GameScene extends Scene {
@@ -11,10 +11,10 @@ export class GameScene extends Scene {
   private currentMonsterIndex: number = 0; // Índice del héroe actualmente seleccionado
   private currentActor: Actor | null = null; // The actor that currently has control
   private currentTurn: boolean = true; // true for heroes' turn, false for monsters' turn
-  // private actorQueue: Actor[] = []
+
 
   onInitialize(engine: Engine) {
-    const characters = createCharacters(2, 3); // 10 héroes y 1 monstruo
+    const characters = createCharacters(2, 3); // 2 héroes y 3 monstruos
 
     characters.forEach((character) => {
       const actor = new Actor({
@@ -48,29 +48,31 @@ export class GameScene extends Scene {
     engine.input.keyboard.on("press", (evt) => {
       // Lógica para atacar a un monstruo
       if (evt.key === Input.Keys.C) {
-        console.log("Attacking monsters...");
-        this.monsters.forEach((monsterActor, index) => {
-          const currentHeroCharacter = this.heroCharacters[this.currentHeroIndex];
-          if (!currentHeroCharacter) return;
+        // console.log("Attacking monsters...");
+        // this.monsters.forEach((monsterActor, index) => {
+        //   const currentHeroCharacter = this.heroCharacters[this.currentHeroIndex];
+        //   if (!currentHeroCharacter) return;
 
-          console.log(`Monster health: ${this.monsterCharacters[index].health}`);
+        //   console.log(`Monster health: ${this.monsterCharacters[index].health}`);
           
-            const damage = currentHeroCharacter.attack(this.monsterCharacters[index]);
-            monsterActor.color = Color.LightGray;
-            console.log(`Damage caused: ${damage}`);
-            console.log(`${index} Monster health: ${this.monsterCharacters[index].health}`);
+        //     const damage = currentHeroCharacter.attack(this.monsterCharacters[index]);
+        //     monsterActor.color = Color.LightGray;
+        //     console.log(`Damage caused: ${damage}`);
+        //     console.log(`${index} Monster health: ${this.monsterCharacters[index].health}`);
 
-            if (this.monsterCharacters[index].health <= 0) {
-              monsterActor.color = Color.Gray;
-            }
+        //     if (this.monsterCharacters[index].health <= 0) {
+        //       monsterActor.color = Color.Gray;
+        //     }
           
-        });
-        this.changeTurn();
+        // });
+        if (this.currentTurn) {
+          this.performHeroAttack();
+         } else {
+          this.performMonsterAttack();
+         }
+         
       } 
-            //  // Lógica para atacar a un heroe
-            //  if (evt.key === Input.Keys.V) {
-
-            // } 
+      // this.changeTurn();
     });
 
     engine.input.keyboard.on("hold", (evt) => {
@@ -93,7 +95,86 @@ export class GameScene extends Scene {
 
     engine.input.keyboard.on("release", () => {
 
-      // The Monster Attacks 
+      // // The Monster Attacks 
+      // console.log("Attacking hero...");
+      // this.heroes.forEach((heroesActor, index) => {
+      //   const currentMonsterCharacter = this.monsterCharacters[this.currentMonsterIndex];
+      //   if (!currentMonsterCharacter) return;
+
+      //   console.log(`Hero health: ${this.heroCharacters[index].health}`);
+        
+      //     const damage = currentMonsterCharacter.attack(this.heroCharacters[0]);
+          
+      //     console.log(`Damage caused: ${damage}`);
+      //     console.log(`${index} Hero health: ${this.heroCharacters[0].health}`);
+
+      //     if (this.heroCharacters[index].health <= 0) {
+      //       heroesActor.color = Color.Gray;
+      //     }
+        
+      // });
+      // this.changeTurn();
+
+    });
+
+  }
+
+
+  update(engine: Engine, delta: number) {
+    super.update(engine, delta);
+
+    // const currentActor = this.currentTurn ? this.heroes[this.currentHeroIndex] : this.monsters[this.currentMonsterIndex];
+
+     //If it's the current actor's turn
+    if (this.currentActor) {
+   // Allow the actor to perform an action
+      this.currentActor.rotation = 1
+
+    }
+  }
+     
+  changeTurn() {
+    // Si es el turno de los héroes
+    if (this.currentTurn) {
+      // Pasa al siguiente héroe
+      this.currentHeroIndex = (this.currentHeroIndex + 1) % this.heroes.length;
+      // Establece el actor actual como el héroe actual
+      this.currentActor = this.heroes[this.currentHeroIndex];
+    } else {
+      // Si es el turno de los monstruos
+      // Pasa al siguiente monstruo
+      this.currentMonsterIndex = (this.currentMonsterIndex + 1) % this.monsters.length;
+      // Establece el actor actual como el monstruo actual
+      this.currentActor = this.monsters[this.currentMonsterIndex];
+    }
+    
+    // Cambia el turno
+    this.currentTurn = !this.currentTurn;
+   }
+   
+  performHeroAttack() {
+    console.log("*******Hero is attacking...");
+    console.log("Attacking Monster...");
+    const currentHero = this.heroes[this.currentHeroIndex];
+    const currentHeroCharacter = this.heroCharacters[this.currentHeroIndex];
+    if (!currentHero || !currentHeroCharacter) return;
+
+    this.monsters.forEach((monsterActor, index) => {
+        const damage = currentHeroCharacter.attack(this.monsterCharacters[index]);
+        console.log(`Damage caused: ${damage}`);
+        console.log(`Monster health: ${this.monsterCharacters[index].health}`);
+        if (this.monsterCharacters[index].health <= 0) {
+          monsterActor.color = Color.Gray;
+        }
+    });
+
+
+    this.changeTurn()
+  }
+
+  performMonsterAttack() {
+    console.log("Monster is attacking...");
+         // The Monster Attacks 
       console.log("Attacking hero...");
       this.heroes.forEach((heroesActor, index) => {
         const currentMonsterCharacter = this.monsterCharacters[this.currentMonsterIndex];
@@ -111,50 +192,8 @@ export class GameScene extends Scene {
           }
         
       });
-      this.changeTurn();
-
-    });
-
-  }
 
 
-  update(engine: Engine, delta: number) {
-    super.update(engine, delta);
-
-    // Actualiza el actor activo
-
-    const currentActor = this.currentTurn ? this.heroes[this.currentHeroIndex] : this.monsters[this.currentMonsterIndex];
-     // If it's the current actor's turn
-  //   if (this.actorQueue[0] === this.currentActor) {
-  //  // Allow the actor to perform an action
-  //     this.currentActor.rotation = 1
-  //     currentActor.color = Color.White;
-  //   }
-  }
-     
-  changeTurn() {
-    
-//      // Remove the current actor from the front of the queue
-//  const currentActor = this.actorQueue.shift();
-
-//  // Add the current actor to the back of the queue
-//  this.actorQueue.push(currentActor);
-
-//  // Set the current actor to the new front of the queue
-//  this.currentActor = this.actorQueue[0];
- 
-    // // Cambia al siguiente actor (héroe o monstruo) y alterna el tipo
-    // if (this.currentActor === this.heroes[this.currentHeroIndex]) {
-    //   this.currentHeroIndex = (this.currentHeroIndex + 1) % this.heroes.length;
-    //   this.currentActor = this.monsters[this.currentMonsterIndex];
-    // } else {
-    //   this.currentActor = this.heroes[this.currentHeroIndex];
-    // }
-  
-    // //Activa al nuevo actor
-    // this.currentActor.active = true
-  
-    // Cambia el turno
-    this.currentTurn = !this.currentTurn;
+    this.changeTurn()
   }
 }
