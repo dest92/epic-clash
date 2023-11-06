@@ -1,5 +1,17 @@
-import { Actor, Color, vec, Scene, Engine, Input } from "excalibur";
-import { Warrior, Mage, Monster, Weapon, ICharacter, Hero } from "./characters";
+import {
+  Actor,
+  Color,
+  Text,
+  Font,
+  FontUnit,
+  TextAlign,
+  vec,
+  Scene,
+  Engine,
+  Input,
+  Label,
+} from "excalibur";
+import { Warrior, Mage, Monster, Weapon, ICharacter } from "./characters";
 import { createCharacters } from "./actors";
 
 export class GameScene extends Scene {
