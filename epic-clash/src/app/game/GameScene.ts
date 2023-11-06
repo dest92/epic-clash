@@ -115,7 +115,6 @@ export class GameScene extends Scene {
     });
 
     // Velocidad a la que se moverán los héroes
-    const speed = 100;
 
     engine.input.keyboard.on("press", (evt) => {
       // Lógica para atacar a un monstruo con la tecla "C"
@@ -164,6 +163,13 @@ export class GameScene extends Scene {
     this.currentTurn = !this.currentTurn;
   }
 
+  scheduleMonsterAttack() {
+    // Espera un breve período antes de realizar el ataque del monstruo
+    setTimeout(() => {
+      this.performMonsterAttack();
+    }, 2000); // Espera 1 segundo antes de que el monstruo ataque
+  }
+
   performHeroAttack() {
     const currentHero = this.heroes[this.currentHeroIndex];
     const currentHeroCharacter = this.heroCharacters[this.currentHeroIndex];
@@ -186,6 +192,7 @@ export class GameScene extends Scene {
     }
 
     this.changeTurn();
+    this.scheduleMonsterAttack();
   }
 
   performMonsterAttack() {
