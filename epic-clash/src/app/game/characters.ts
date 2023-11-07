@@ -53,6 +53,9 @@ export abstract class Hero implements IHero {
 
 // Clase Warrior
 export class Warrior extends Hero {
+  pickWeapon(weapon: Weapon): void { 
+    this.weapon = weapon;
+  }
   attack(target: ICharacter): number {
     const damage = this.hasWeapon() ? this.weapon!.damage * 3 : 0;
     target.health -= damage;
