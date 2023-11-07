@@ -23,7 +23,7 @@ function getRandomName(type: CharacterType): string {
 
 // Función para determinar si un personaje tiene un arma
 function hasWeapon(): boolean {
-  return Math.random() < 0.5; // 50% de probabilidad de tener un arma
+  return Math.random() < 0.8; // 80% de probabilidad de tener un arma
 }
 
 // Función para crear héroes y monstruos
@@ -39,7 +39,7 @@ export function createCharacters(
     const weapon = hasWeapon() ? new Weapon(getRandomInt(1, 10)) : undefined; // Arma aleatoria o ninguna
     const name = getRandomName(isMage ? 'wizard' : 'warrior');
     if (isMage) {
-      characters.push(new Mage(name, weapon));
+      characters.push(new Mage(name, undefined));
     } else {
       characters.push(new Warrior(name, weapon));
     }

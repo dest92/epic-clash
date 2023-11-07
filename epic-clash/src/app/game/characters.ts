@@ -62,8 +62,12 @@ export class Warrior extends Hero {
 
 // Clase Mage
 export class Mage extends Hero {
+  weapon = undefined;
+  hasWeapon(): boolean {
+    return false;
+  }
   attack(target: ICharacter): number {
-    const damage = this.hasWeapon() ? 20 : 1;
+    const damage = 20;
     target.health -= damage;
     return damage;
   }
