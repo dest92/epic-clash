@@ -1,47 +1,41 @@
-"use client";
-import React, { useRef, useEffect } from "react";
-import { Engine } from "excalibur";
-import { initializeGame, startGame } from "./main";
-import Layout from "../components/layout";
+"use client"
+import React, { useRef, useEffect } from 'react';
+import Layout from '../components/layout';
+import { Engine } from 'excalibur';
 
-export const GamePage = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+export default function GamePage() {
+  const canvasRef = useRef(null);
   const gameRef = useRef<Engine | null>(null);
 
-  const resetGame = () => {
-    if (gameRef.current) {
-      gameRef.current.stop();
-    }
-    // Aquí deberías agregar la función cleanUpPlayButtons si es necesario
-  };
-
   useEffect(() => {
-    // HMR support
-    resetGame();
-
-    // Verifica si el elemento canvas existe
     if (canvasRef.current) {
-      // Inicializa y ejecuta el juego
-      gameRef.current = initializeGame(canvasRef.current);
-      startGame(gameRef.current);
+      // Dynamically import the initialize and start functions from your game module
+      import("./main").then(({ initializeGame, startGame }) => {
+        gameRef.current = initializeGame(canvasRef.current!);
+        startGame(gameRef.current);
+      });
     }
 
-    return resetGame;
+    // Define a cleanup function in case your component unmounts
+    return () => {
+      if (gameRef.current) {
+        // Assuming your game instance has a method to clean up or stop the game
+        gameRef.current.stop();
+      }
+    };
   }, []);
 
   return (
     <>
       <div className="fondo-about">
-        <Layout home={true} title about>
+        <Layout home title>
           <div className="flex justify-center items-center mt-20 mb-10">
-            <div className="border-8  border-stone-900">
-              <canvas ref={canvasRef} className="align-middle"></canvas>
+            <div className="border-8 border-stone-900">
+              <canvas ref={canvasRef} className="align-middle" />
             </div>
           </div>
         </Layout>
       </div>
     </>
   );
-};
-
-export default GamePage;
+}
