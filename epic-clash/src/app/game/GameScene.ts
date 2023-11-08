@@ -23,6 +23,7 @@ export class GameScene extends Scene {
   private currentMonsterIndex: number = 0; // Índice del héroe actualmente seleccionado
   private currentActor: Actor | null = null; // The actor that currently has control
   private currentTurn: boolean = true; // true for heroes' turn, false for monsters' turn
+  
 
   onInitialize(engine: Engine) {
     const characters = createCharacters(2, 3); // 2 héroes y 3 monstruos
@@ -114,7 +115,8 @@ export class GameScene extends Scene {
       this.currentActor = this.heroes[0]; // Start with the first hero
     });
 
-    // Velocidad a la que se moverán los héroes
+    this.showWeapon();
+
 
     engine.input.keyboard.on("press", (evt) => {
       // Lógica para atacar a un monstruo con la tecla "C"
@@ -135,12 +137,13 @@ export class GameScene extends Scene {
 
   update(engine: Engine, delta: number) {
     super.update(engine, delta);
-
+    // this.currentActor = this.heroes[this.currentHeroIndex];
     // //If it's the current actor's turn
     // if (this.currentActor) {
     //   // Allow the actor to perform an action
     //   this.currentActor.rotation = 1;
     // }
+
   }
 
   changeTurn() {
@@ -235,4 +238,40 @@ export class GameScene extends Scene {
 
     this.changeTurn();
   }
+  
+  showWeapon() {
+  this.heroes.map((currentHero, index) => {
+    const currentHeroCharacter = this.heroCharacters[index];
+    if (!currentHero || !currentHeroCharacter) return;
+
+    const randomIndex = Math.floor(Math.random() * this.monsters.length);
+    const monsterActor = this.monsters[randomIndex];
+    const monsterCharacter = this.monsterCharacters[randomIndex];
+    const damage = currentHeroCharacter.attack(monsterCharacter);
+ 
+    const heroActor = this.heroes[index]
+    if (currentHeroCharacter.hasWeapon()) {
+      heroActor.color = Color.Gray;
+      console.log(`${currentHeroCharacter.name} has a Weapon `)
+    }
+
+  });
+  this.monsters.map((currentMonster, index) => {
+    const currentMonsterCharacter = this.monsterCharacters[index];
+    if (!currentMonster || !currentMonsterCharacter) return;
+   
+    const randomIndex = Math.floor(Math.random() * this.heroes.length);
+    const heroActor = this.heroes[randomIndex];
+    const heroCharacter = this.heroCharacters[randomIndex];
+    const damage = currentMonsterCharacter.attack(heroCharacter);
+   
+    const monsterActor = this.monsters[index];
+    if (currentMonsterCharacter.hasWeapon()) {
+      monsterActor.color = Color.Gray;
+      console.log(`${currentMonsterCharacter.name} has a Weapon `)
+    }
+   });
+   
+
+}
 }
