@@ -11,16 +11,16 @@ import {
   Input,
   Label,
 } from "excalibur";
-import { Warrior, Mage, Monster, Weapon, ICharacter } from "./characters";
+import { Warrior, Mage, Monster, Weapon, ICharacter, IMonster } from "./characters";
 import { createCharacters } from "./actors";
 
 export class GameScene extends Scene {
   private heroes: Actor[] = [];
   private heroCharacters: ICharacter[] = [];
-  private currentHeroIndex: number = 0; // Índice del héroe actualmente seleccionado
+    private currentHeroIndex: number = 0; // Índice del héroe actualmente seleccionado
   private monsters: Actor[] = [];
   private monsterCharacters: ICharacter[] = [];
-  private currentMonsterIndex: number = 0; // Índice del héroe actualmente seleccionado
+    private currentMonsterIndex: number = 0; // Índice del héroe actualmente seleccionado
   private currentActor: Actor | null = null; // The actor that currently has control
   private currentTurn: boolean = true; // true for heroes' turn, false for monsters' turn
   
@@ -104,8 +104,8 @@ export class GameScene extends Scene {
 
       if (character instanceof Monster) {
         this.monsters.push(actor);
-        this.monsterCharacters.push(character);
-      } else {
+       this.monsterCharacters.push(character);
+       } else {
         this.heroes.push(actor);
         this.heroCharacters.push(character);
       }
@@ -138,12 +138,17 @@ export class GameScene extends Scene {
   update(engine: Engine, delta: number) {
     super.update(engine, delta);
     // this.currentActor = this.heroes[this.currentHeroIndex];
-    // //If it's the current actor's turn
-    // if (this.currentActor) {
-    //   // Allow the actor to perform an action
-    //   this.currentActor.rotation = 1;
+    
+    // if (currentHeroCharacter.health <= 0 || currentHero instanceof Warrior) {
+    //   this.heroWarriors[index].dropWeapon();
+    //   console.log(`${this.heroWarriors[index].name} dropped a weapon... `)
     // }
-
+    // if (currentMonster.health <= 0 || currentMonster instanceof Monster) {
+    //   const droppedWeapon = this.monsterMonsters[index].dropWeapon();
+    //    console.log(`${this.monsterMonsters[index].name} dropped a weapon... `)
+    // }
+    
+   
   }
 
   changeTurn() {
@@ -161,7 +166,16 @@ export class GameScene extends Scene {
       // Establece el actor actual como el monstruo actual
       this.currentActor = this.monsters[this.currentMonsterIndex];
     }
+    // this.monsterCharacters.map(character => {
+    //   if (character instanceof Monster && character.isAlive()! && character.hasWeapon()) {
+    //     console.log(` ${character.name} dropped a weapon...`);
+    //     const weapon = character.dropWeapon();
+        
+    //   } 
+     
 
+    // });
+    
     // Cambia el turno
     this.currentTurn = !this.currentTurn;
   }
@@ -199,8 +213,10 @@ export class GameScene extends Scene {
           this.monsters.splice(randomIndex, 1);
           this.monsterCharacters.splice(randomIndex, 1);
           console.log("monsters alive " + this.monsterCharacters.length);
+          
         }
       }
+  
     });
 
     this.changeTurn();
@@ -227,6 +243,7 @@ export class GameScene extends Scene {
       console.log(`Hero health: ${heroCharacter.health}`);
       if (heroCharacter.health <= 0) {
         heroActor.color = Color.Gray;
+
         heroActor.kill();
         if (heroActor.isKilled()) {
           this.heroes.splice(randomIndex, 1);
@@ -234,41 +251,38 @@ export class GameScene extends Scene {
           console.log("heros alive " + this.heroCharacters.length);
         }
       }
+     
+        if (currentMonsterCharacter instanceof Monster && currentMonsterCharacter.isAlive()! && currentMonsterCharacter.hasWeapon()) {
+          console.log(` ${currentMonsterCharacter.name} dropped a weapon...`);
+          const weapon = currentMonsterCharacter.dropWeapon();
+          console.log(` weapon with ${weapon?.damage} damage dropped...`);
+
+        } 
+       
+  
+   
+ 
     });
 
     this.changeTurn();
   }
   
   showWeapon() {
-  this.heroes.map((currentHero, index) => {
-    const currentHeroCharacter = this.heroCharacters[index];
-    if (!currentHero || !currentHeroCharacter) return;
-
-    const randomIndex = Math.floor(Math.random() * this.monsters.length);
-    const monsterActor = this.monsters[randomIndex];
-    const monsterCharacter = this.monsterCharacters[randomIndex];
-    const damage = currentHeroCharacter.attack(monsterCharacter);
+  this.heroCharacters.map((currentHero, index) => {
+   
  
     const heroActor = this.heroes[index]
-    if (currentHeroCharacter.hasWeapon()) {
+    if (currentHero.hasWeapon()) {
       heroActor.color = Color.Gray;
-      console.log(`${currentHeroCharacter.name} has a Weapon `)
+      console.log(`${currentHero.name} has a Weapon `)
     }
 
   });
-  this.monsters.map((currentMonster, index) => {
-    const currentMonsterCharacter = this.monsterCharacters[index];
-    if (!currentMonster || !currentMonsterCharacter) return;
-   
-    const randomIndex = Math.floor(Math.random() * this.heroes.length);
-    const heroActor = this.heroes[randomIndex];
-    const heroCharacter = this.heroCharacters[randomIndex];
-    const damage = currentMonsterCharacter.attack(heroCharacter);
-   
+  this.monsterCharacters.map((currentMonster, index) => {
     const monsterActor = this.monsters[index];
-    if (currentMonsterCharacter.hasWeapon()) {
+    if (currentMonster.hasWeapon()) {
       monsterActor.color = Color.Gray;
-      console.log(`${currentMonsterCharacter.name} has a Weapon `)
+      console.log(`${currentMonster.name} has a Weapon `)
     }
    });
    
