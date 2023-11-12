@@ -15,13 +15,12 @@ export interface ICharacter {
   weapon?: Weapon;
   attack(target: ICharacter): number;
   hasWeapon(): boolean;
-
+  pickWeapon(weapon: Weapon | undefined): void;
 }
 
 // Interfaz para los héroes
 export interface IHero extends ICharacter {
   dropWeapon(): Weapon | undefined;
-  isAlive(): boolean;
 }
 
 // Interfaz para los monstruos
@@ -52,8 +51,8 @@ export abstract class Hero implements IHero {
   hasWeapon(): boolean {
     return this.weapon !== undefined;
   }
-  isAlive(): boolean {
-    return this.health >= 0
+  pickWeapon(weapon: Weapon): void {
+    this.weapon = weapon;
   }
 }
 
@@ -113,5 +112,9 @@ export class Monster implements IMonster {
 
   hasWeapon(): boolean {
     return this.weapon.damage > 1;
+  }
+
+  pickWeapon(weapon: Weapon): void { 
+    this.weapon.damage = weapon.damage;
   }
 }
