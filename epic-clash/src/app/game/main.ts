@@ -2,6 +2,7 @@
 import { Engine, Color } from "excalibur";
 import { MainMenuScene } from "./MainMenu";
 import { GameOverScene } from "./GameOverScene";
+import { HowToPlayScene } from "./HowToPlayScene";
 
 export const initializeGame = (canvasElement: HTMLCanvasElement) => {
   const game = new Engine({
@@ -17,6 +18,7 @@ export const initializeGame = (canvasElement: HTMLCanvasElement) => {
   // Agregar escenas al juego
   game.add("menu", new MainMenuScene());
   game.add("gameOver", new GameOverScene());
+  game.add("howToPlay", new HowToPlayScene());
 
   // Iniciar con el menú principal
   game.goToScene("menu");
