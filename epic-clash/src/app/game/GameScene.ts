@@ -396,10 +396,7 @@ export class GameScene extends Scene {
           this.heroCharacters.splice(randomIndex, 1);
           this.heroHealthBars.splice(randomIndex, 1);
 
-          if (currentMonsterCharacter instanceof Monster && !currentMonsterCharacter.   hasDroppedWeapon && currentMonsterCharacter.hasWeapon()) {
-            // console.log(`currentHeroCharacter instanceof Warrior: ${currentMonsterCharacter instanceof Monster}`);
-            // console.log(`currentHeroCharacter.hasDroppedWeapon: ${currentMonsterCharacter.hasDroppedWeapon}`);
-            // console.log(`currentHeroCharacter.hasWeapon(): ${currentMonsterCharacter.hasWeapon()}`);
+          if (currentMonsterCharacter instanceof Monster && !currentMonsterCharacter.hasDroppedWeapon && currentMonsterCharacter.hasWeapon()) {
           
             console.log(` ****${currentMonsterCharacter.name} dropped a weapon...`);
             const weapon = currentMonsterCharacter.dropWeapon();
