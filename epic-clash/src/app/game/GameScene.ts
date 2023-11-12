@@ -73,7 +73,7 @@ export class GameScene extends Scene {
 
     engine.start(loader);
     this.add(background);
-    const characters = createCharacters(1, 1);
+    const characters = createCharacters(2, 3);
     const attackButton = new Actor({
       pos: vec(engine.halfDrawWidth + 330, engine.halfDrawHeight + 170),
       width: 130,
@@ -171,18 +171,6 @@ export class GameScene extends Scene {
     });
 
     this.showWeapon();
-    
-
-    engine.input.keyboard.on("press", (evt) => {
-      // Lógica para atacar a un monstruo con la tecla "C"
-      if (evt.key === Input.Keys.C) {
-        if (this.currentTurn) {
-          this.performHeroAttack();
-        } else {
-          this.performMonsterAttack();
-        }
-      }
-    });
 
     this.add(attackButton);
     this.add(changeHeroButton);
@@ -248,12 +236,16 @@ export class GameScene extends Scene {
         monsterActor.color = Color.Gray;
         monsterActor.kill();
         // Elimina el monstruo de la lista después de que haya sido "muerto"
+        if(monsterActor.isKilled()){
         this.monsters.splice(randomIndex, 1);
         this.monsterCharacters.splice(randomIndex, 1);
-        this.checkGameOver();
-      }
-       // Drop Weapon del Hero que muere.
-      if (currentHeroCharacter instanceof Warrior && !currentHeroCharacter.hasDroppedWeapon && currentHeroCharacter.health >= 0 && currentHeroCharacter.hasWeapon()) {
+
+              // Drop Weapon del Warrior que muere.
+      if (currentHeroCharacter instanceof Warrior && !currentHeroCharacter.hasDroppedWeapon && currentHeroCharacter.hasWeapon()) {
+        console.log(`currentHeroCharacter instanceof Warrior: ${currentHeroCharacter instanceof Warrior}`);
+        console.log(`currentHeroCharacter.hasDroppedWeapon: ${currentHeroCharacter.hasDroppedWeapon}`);
+        console.log(`currentHeroCharacter.hasWeapon(): ${currentHeroCharacter.hasWeapon()}`);
+
         console.log(` *********${currentHeroCharacter.name} dropped a weapon...`);
         const weapon = currentHeroCharacter.dropWeapon();
         console.log(` weapon with ${weapon?.damage} damage dropped...`);
@@ -269,6 +261,11 @@ export class GameScene extends Scene {
           console.log(`weapon with ${weapon?.damage} damage dropped and given to ${heroToReceiveWeapon.name}...`);
         }
       }
+        }
+
+        this.checkGameOver();
+      }
+   
       
 
     });
@@ -306,22 +303,32 @@ export class GameScene extends Scene {
           this.heroCharacters.splice(randomIndex, 1);
           console.log("heros alive " + this.heroCharacters.length);
           
+                  // Drop Weapon del Monster que muere.
+      if (currentMonsterCharacter instanceof Monster && !currentMonsterCharacter.hasDroppedWeapon && currentMonsterCharacter.hasWeapon()) {
+        console.log(`currentHeroCharacter instanceof Warrior: ${currentMonsterCharacter instanceof Monster}`);
+        console.log(`currentHeroCharacter.hasDroppedWeapon: ${currentMonsterCharacter.hasDroppedWeapon}`);
+        console.log(`currentHeroCharacter.health >= 0: ${currentMonsterCharacter.health >= 0}`);
+        console.log(`currentHeroCharacter.hasWeapon(): ${currentMonsterCharacter.hasWeapon()}`);
+      
+        console.log(` ****${currentMonsterCharacter.name} dropped a weapon...`);
+        const weapon = currentMonsterCharacter.dropWeapon();
+      
+        // Get an array of all monsters except the one that dropped the weapon
+        const monstersExceptCurrent = this.monsterCharacters.filter(monster => monster !== currentMonsterCharacter);
+      
+        // If there are monsters left, select a random monster to receive the weapon
+        if (monstersExceptCurrent.length > 0) {
+          let randomIndex = Math.floor(Math.random() * monstersExceptCurrent.length);
+          let monsterToReceiveWeapon = monstersExceptCurrent[randomIndex];
+          monsterToReceiveWeapon.pickWeapon(weapon);
+          console.log(`weapon with ${weapon?.damage} damage dropped and given to ${monsterToReceiveWeapon.name}...`);
+        }
+      }
         }
       }
      
-      // Drop Weapon del Monster que muere.
-        if (currentMonsterCharacter instanceof Monster && !currentMonsterCharacter.hasDroppedWeapon && currentMonsterCharacter.health >= 0 && currentMonsterCharacter.hasWeapon()) {
-          console.log(` ****${currentMonsterCharacter.name} dropped a weapon...`);
-          const weapon = currentMonsterCharacter.dropWeapon();
-          if (this.monsterCharacters[0].health <1) {
-            this.monsterCharacters[1].pickWeapon(weapon);
-            console.log(`weapon with ${weapon?.damage} damage dropped and given to ${this.monsterCharacters[1].name}...`);
-          } else { 
-            this.monsterCharacters[0].pickWeapon(weapon);          console.log(`weapon with ${weapon?.damage} damage dropped and given to ${this.monsterCharacters[0].name}...`);
-          }
-          
-  
-        } 
+
+
  
     });
 
