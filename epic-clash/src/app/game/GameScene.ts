@@ -242,9 +242,9 @@ export class GameScene extends Scene {
 
               // Drop Weapon del Warrior que muere.
       if (currentHeroCharacter instanceof Warrior && !currentHeroCharacter.hasDroppedWeapon && currentHeroCharacter.hasWeapon()) {
-        console.log(`currentHeroCharacter instanceof Warrior: ${currentHeroCharacter instanceof Warrior}`);
-        console.log(`currentHeroCharacter.hasDroppedWeapon: ${currentHeroCharacter.hasDroppedWeapon}`);
-        console.log(`currentHeroCharacter.hasWeapon(): ${currentHeroCharacter.hasWeapon()}`);
+        // console.log(`currentHeroCharacter instanceof Warrior: ${currentHeroCharacter instanceof Warrior}`);
+        // console.log(`currentHeroCharacter.hasDroppedWeapon: ${currentHeroCharacter.hasDroppedWeapon}`);
+        // console.log(`currentHeroCharacter.hasWeapon(): ${currentHeroCharacter.hasWeapon()}`);
 
         console.log(` *********${currentHeroCharacter.name} dropped a weapon...`);
         const weapon = currentHeroCharacter.dropWeapon();
@@ -305,10 +305,9 @@ export class GameScene extends Scene {
           
                   // Drop Weapon del Monster que muere.
       if (currentMonsterCharacter instanceof Monster && !currentMonsterCharacter.hasDroppedWeapon && currentMonsterCharacter.hasWeapon()) {
-        console.log(`currentHeroCharacter instanceof Warrior: ${currentMonsterCharacter instanceof Monster}`);
-        console.log(`currentHeroCharacter.hasDroppedWeapon: ${currentMonsterCharacter.hasDroppedWeapon}`);
-        console.log(`currentHeroCharacter.health >= 0: ${currentMonsterCharacter.health >= 0}`);
-        console.log(`currentHeroCharacter.hasWeapon(): ${currentMonsterCharacter.hasWeapon()}`);
+        // console.log(`currentHeroCharacter instanceof Warrior: ${currentMonsterCharacter instanceof Monster}`);
+        // console.log(`currentHeroCharacter.hasDroppedWeapon: ${currentMonsterCharacter.hasDroppedWeapon}`);
+        // console.log(`currentHeroCharacter.hasWeapon(): ${currentMonsterCharacter.hasWeapon()}`);
       
         console.log(` ****${currentMonsterCharacter.name} dropped a weapon...`);
         const weapon = currentMonsterCharacter.dropWeapon();
