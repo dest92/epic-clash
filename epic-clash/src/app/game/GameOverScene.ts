@@ -8,11 +8,16 @@ import {
   vec,
   FontUnit,
   Actor,
+  Sound,
 } from "excalibur";
 import { Images, loader } from "./resources";
+import { backgroundSounds } from "./MainMenu";
+
+export const gameOverSound = new Sound("../assets/sounds/dead.wav");
 
 export class GameOverScene extends Scene {
   onInitialize(engine: Engine) {
+    backgroundSounds.stop();
     const background = new Actor({
       pos: vec(engine.halfDrawWidth, engine.halfDrawHeight),
       width: engine.drawWidth + 100,
@@ -21,10 +26,18 @@ export class GameOverScene extends Scene {
 
     background.graphics.use(Images.gameOverImage.toSprite());
 
+    loader.addResource(gameOverSound);
+
     engine.start(loader);
 
+    gameOverSound.load().then(() => {
+      console.log("loaded");
+      gameOverSound.play();
+      gameOverSound.loop = true;
+      gameOverSound.volume = 0.1;
+    });
+
     // Crear un label para el mensaje de Game Over
-    
 
     // Agregar el label a la escena
 
@@ -38,7 +51,6 @@ export class GameOverScene extends Scene {
     menuButton.graphics.use(Images.back.toSprite());
 
     // Crear un label para el texto del botón
-  
 
     // Habilitar la captura de eventos de puntero para el botón de menú
     menuButton.on("pointerup", () => {

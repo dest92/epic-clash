@@ -7,8 +7,13 @@ const Images = {
   back: new ex.ImageSource("/assets/images/back.png"),
 };
 
+const Sounds = {
+  backgroundMusic: new ex.Sound("/assets/sounds/title.wav"),
+  dead: new ex.Sound("/assets/sounds/dead.wav"),
+};
+
 const loader = new ex.Loader();
-const allResources = { ...Images };
+const allResources = { ...Images, ...Sounds };
 for (const res in allResources) {
   // @ts-ignore
   loader.addResource(allResources[res]);
