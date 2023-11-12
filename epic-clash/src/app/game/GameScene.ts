@@ -16,18 +16,48 @@ import { Warrior, Mage, Monster, Weapon, ICharacter } from "./characters";
 import { Images, loader } from "./resources";
 import HealthBar from "./HealthBar";
 
-import { createCharacters } from "./actors";
+import { createCharacters, getRandomName } from "./actors";
 export class GameScene extends Scene {
   private heroes: Actor[] = [];
   private heroCharacters: ICharacter[] = [];
-    private currentHeroIndex: number = 0; // Índice del héroe actualmente seleccionado
+  private currentHeroIndex: number = 0; // Índice del héroe actualmente seleccionado
   private monsters: Actor[] = [];
   private monsterCharacters: ICharacter[] = [];
-    private currentMonsterIndex: number = 0; // Índice del héroe actualmente seleccionado
+  private currentMonsterIndex: number = 0; // Índice del héroe actualmente seleccionado
   private currentActor: Actor | null = null; // The actor that currently has control
   private currentTurn: boolean = true; // true for heroes' turn, false for monsters' turn
   private heroHealthBars: HealthBar[] = [];
   private monsterHealthBars: HealthBar[] = [];
+
+  private changeHeroType() {
+    // Obtén el héroe actual y su barra de salud
+    let currentHero = this.heroCharacters[this.currentHeroIndex];
+    console.log(`currentHero: ${currentHero.name}`);
+    // Determina el nuevo tipo de héroe
+    let newHeroType = currentHero instanceof Warrior ? Mage : Warrior;
+
+    // Crea una nueva instancia del nuevo tipo de héroe con el mismo nombre y salud
+    let newHero = new newHeroType(currentHero.name);
+    let isMage;
+    if (newHero instanceof Mage) {
+      isMage = true;
+    } else {
+      isMage = false;
+    }
+    newHero.name = getRandomName(isMage ? "wizard" : "warrior");
+    newHero.health = currentHero.health;
+    newHero.weapon = currentHero.weapon; // Asegúrate de que el mago no reciba un arma
+    console.log(`newHero: ${newHero.name}`);
+    // Si el nuevo héroe es un mago, asegúrate de que no tenga un arma
+    if (newHero instanceof Mage) {
+      newHero.weapon = undefined;
+    }
+
+    // Actualiza la referencia en el arreglo de héroes
+    this.heroCharacters[this.currentHeroIndex] = newHero;
+
+    // Actualiza la posición y la salud de la barra de salud
+  }
 
   private checkGameOver() {
     console.log("Checking game over...");
@@ -42,6 +72,34 @@ export class GameScene extends Scene {
     }
   }
 
+  private nextHero() {
+    this.currentHeroIndex =
+      (this.currentHeroIndex + 1) % this.heroCharacters.length;
+    this.updateCurrentHero();
+  }
+
+  // Método para cambiar al héroe anterior
+  private previousHero() {
+    this.currentHeroIndex =
+      (this.currentHeroIndex - 1 + this.heroCharacters.length) %
+      this.heroCharacters.length;
+    this.updateCurrentHero();
+  }
+
+  // Método para actualizar el héroe actual
+  private updateCurrentHero() {
+    // Aquí puedes agregar lógica para actualizar la UI con la información del nuevo héroe seleccionado
+    // Por ejemplo, si muestras el nombre o la salud del héroe en la UI, deberías actualizar esos elementos aquí
+
+    // También puedes resaltar el héroe seleccionado para que el jugador sepa cuál está controlando
+    this.heroes.forEach((hero, index) => {
+      if (index === this.currentHeroIndex) {
+        hero.color = Color.Yellow; // Color de resaltado para el héroe seleccionado
+      } else {
+        hero.color = Color.Red; // Color normal para los otros héroes
+      }
+    });
+  }
   private createGameOverLabel = (message: string) => {
     const gameOverLabel = new Label({
       text: message,
@@ -121,8 +179,17 @@ export class GameScene extends Scene {
     });
 
     changeHeroButton.on("pointerup", () => {
-      this.currentHeroIndex = (this.currentHeroIndex + 1) % this.heroes.length;
-      //deberia cambiar el tipo de heroe y el actor
+      this.changeHeroType();
+    });
+
+    engine.input.keyboard.on("press", (evt) => {
+      if (evt.key === "ArrowRight") {
+        // Cambiar al siguiente héroe
+        this.nextHero();
+      } else if (evt.key === "ArrowLeft") {
+        // Cambiar al héroe anterior
+        this.previousHero();
+      }
     });
 
     const labelChangeHero = new Label({
@@ -197,7 +264,7 @@ export class GameScene extends Scene {
       // Establece el actor actual como el monstruo actual
       this.currentActor = this.monsters[this.currentMonsterIndex];
     }
-    
+
     // Cambia el turno
     this.currentTurn = !this.currentTurn;
   }
@@ -236,38 +303,47 @@ export class GameScene extends Scene {
         monsterActor.color = Color.Gray;
         monsterActor.kill();
         // Elimina el monstruo de la lista después de que haya sido "muerto"
-        if(monsterActor.isKilled()){
-        this.monsters.splice(randomIndex, 1);
-        this.monsterCharacters.splice(randomIndex, 1);
+        if (monsterActor.isKilled()) {
+          this.monsters.splice(randomIndex, 1);
+          this.monsterCharacters.splice(randomIndex, 1);
 
-              // Drop Weapon del Warrior que muere.
-      if (currentHeroCharacter instanceof Warrior && !currentHeroCharacter.hasDroppedWeapon && currentHeroCharacter.hasWeapon()) {
-        // console.log(`currentHeroCharacter instanceof Warrior: ${currentHeroCharacter instanceof Warrior}`);
-        // console.log(`currentHeroCharacter.hasDroppedWeapon: ${currentHeroCharacter.hasDroppedWeapon}`);
-        // console.log(`currentHeroCharacter.hasWeapon(): ${currentHeroCharacter.hasWeapon()}`);
+          // Drop Weapon del Warrior que muere.
+          if (
+            currentHeroCharacter instanceof Warrior &&
+            !currentHeroCharacter.hasDroppedWeapon &&
+            currentHeroCharacter.hasWeapon()
+          ) {
+            // console.log(`currentHeroCharacter instanceof Warrior: ${currentHeroCharacter instanceof Warrior}`);
+            // console.log(`currentHeroCharacter.hasDroppedWeapon: ${currentHeroCharacter.hasDroppedWeapon}`);
+            // console.log(`currentHeroCharacter.hasWeapon(): ${currentHeroCharacter.hasWeapon()}`);
 
-        console.log(` *********${currentHeroCharacter.name} dropped a weapon...`);
-        const weapon = currentHeroCharacter.dropWeapon();
-        console.log(` weapon with ${weapon?.damage} damage dropped...`);
-      
-        // Get an array of all heroes except the one that dropped the weapon
-        const heroesExceptCurrent = this.heroCharacters.filter(hero => hero !== currentHeroCharacter);
-      
-        // If there are heroes left, select a random hero to receive the weapon
-        if (heroesExceptCurrent.length > 0) {
-          let randomIndex = Math.floor(Math.random() * heroesExceptCurrent.length);
-          let heroToReceiveWeapon = heroesExceptCurrent[randomIndex];
-          heroToReceiveWeapon.pickWeapon(weapon);
-          console.log(`weapon with ${weapon?.damage} damage dropped and given to ${heroToReceiveWeapon.name}...`);
-        }
-      }
+            console.log(
+              ` *********${currentHeroCharacter.name} dropped a weapon...`
+            );
+            const weapon = currentHeroCharacter.dropWeapon();
+            console.log(` weapon with ${weapon?.damage} damage dropped...`);
+
+            // Get an array of all heroes except the one that dropped the weapon
+            const heroesExceptCurrent = this.heroCharacters.filter(
+              (hero) => hero !== currentHeroCharacter
+            );
+
+            // If there are heroes left, select a random hero to receive the weapon
+            if (heroesExceptCurrent.length > 0) {
+              let randomIndex = Math.floor(
+                Math.random() * heroesExceptCurrent.length
+              );
+              let heroToReceiveWeapon = heroesExceptCurrent[randomIndex];
+              heroToReceiveWeapon.pickWeapon(weapon);
+              console.log(
+                `weapon with ${weapon?.damage} damage dropped and given to ${heroToReceiveWeapon.name}...`
+              );
+            }
+          }
         }
 
         this.checkGameOver();
       }
-   
-      
-
     });
 
     this.changeTurn();
@@ -290,7 +366,7 @@ export class GameScene extends Scene {
 
       const damage = currentMonsterCharacter.attack(heroCharacter);
       const heroHealthBar = this.heroHealthBars[randomIndex];
-    heroHealthBar.updateHealth(heroCharacter.health);
+      heroHealthBar.updateHealth(heroCharacter.health);
       console.log(`${heroCharacter.name} being attacked`);
       console.log(`Damage caused: ${damage}`);
       console.log(`Hero health: ${heroCharacter.health}`);
@@ -302,57 +378,63 @@ export class GameScene extends Scene {
           this.heroes.splice(randomIndex, 1);
           this.heroCharacters.splice(randomIndex, 1);
           console.log("heros alive " + this.heroCharacters.length);
-          
-                  // Drop Weapon del Monster que muere.
-      if (currentMonsterCharacter instanceof Monster && !currentMonsterCharacter.hasDroppedWeapon && currentMonsterCharacter.hasWeapon()) {
-        // console.log(`currentHeroCharacter instanceof Warrior: ${currentMonsterCharacter instanceof Monster}`);
-        // console.log(`currentHeroCharacter.hasDroppedWeapon: ${currentMonsterCharacter.hasDroppedWeapon}`);
-        // console.log(`currentHeroCharacter.hasWeapon(): ${currentMonsterCharacter.hasWeapon()}`);
-      
-        console.log(` ****${currentMonsterCharacter.name} dropped a weapon...`);
-        const weapon = currentMonsterCharacter.dropWeapon();
-      
-        // Get an array of all monsters except the one that dropped the weapon
-        const monstersExceptCurrent = this.monsterCharacters.filter(monster => monster !== currentMonsterCharacter);
-      
-        // If there are monsters left, select a random monster to receive the weapon
-        if (monstersExceptCurrent.length > 0) {
-          let randomIndex = Math.floor(Math.random() * monstersExceptCurrent.length);
-          let monsterToReceiveWeapon = monstersExceptCurrent[randomIndex];
-          monsterToReceiveWeapon.pickWeapon(weapon);
-          console.log(`weapon with ${weapon?.damage} damage dropped and given to ${monsterToReceiveWeapon.name}...`);
+
+          // Drop Weapon del Monster que muere.
+          if (
+            currentMonsterCharacter instanceof Monster &&
+            !currentMonsterCharacter.hasDroppedWeapon &&
+            currentMonsterCharacter.hasWeapon()
+          ) {
+            // console.log(`currentHeroCharacter instanceof Warrior: ${currentMonsterCharacter instanceof Monster}`);
+            // console.log(`currentHeroCharacter.hasDroppedWeapon: ${currentMonsterCharacter.hasDroppedWeapon}`);
+            // console.log(`currentHeroCharacter.hasWeapon(): ${currentMonsterCharacter.hasWeapon()}`);
+
+            console.log(
+              ` ****${currentMonsterCharacter.name} dropped a weapon...`
+            );
+            const weapon = currentMonsterCharacter.dropWeapon();
+
+            // Get an array of all monsters except the one that dropped the weapon
+            const monstersExceptCurrent = this.monsterCharacters.filter(
+              (monster) => monster !== currentMonsterCharacter
+            );
+
+            // If there are monsters left, select a random monster to receive the weapon
+            if (monstersExceptCurrent.length > 0) {
+              let randomIndex = Math.floor(
+                Math.random() * monstersExceptCurrent.length
+              );
+              let monsterToReceiveWeapon = monstersExceptCurrent[randomIndex];
+              monsterToReceiveWeapon.pickWeapon(weapon);
+              console.log(
+                `weapon with ${weapon?.damage} damage dropped and given to ${monsterToReceiveWeapon.name}...`
+              );
+            }
+          }
         }
       }
-        }
-      }
-     
-
-
- 
     });
 
     this.changeTurn();
   }
-  
-  showWeapon() {
-  this.heroCharacters.map((currentHero, index) => {
-    const heroActor = this.heroes[index]
-   
-    if (currentHero.hasWeapon()) {
-      heroActor.color = Color.fromHex("fa7c5f");
-      console.log(`${currentHero.name} has a Weapon `)
-    }
-    console.log(`and ${currentHero.health} of Health `)
-  });
-  this.monsterCharacters.map((currentMonster, index) => {
-    const monsterActor = this.monsters[index];
-    if (currentMonster.hasWeapon()) {
-      monsterActor.color = Color.fromHex("9cff86");
-      console.log(`${currentMonster.name} has a Weapon `)
-    }
-    console.log(`and ${currentMonster.health} of Health `)
-   });
-   
 
-}
+  showWeapon() {
+    this.heroCharacters.map((currentHero, index) => {
+      const heroActor = this.heroes[index];
+
+      if (currentHero.hasWeapon()) {
+        heroActor.color = Color.fromHex("fa7c5f");
+        console.log(`${currentHero.name} has a Weapon `);
+      }
+      console.log(`and ${currentHero.health} of Health `);
+    });
+    this.monsterCharacters.map((currentMonster, index) => {
+      const monsterActor = this.monsters[index];
+      if (currentMonster.hasWeapon()) {
+        monsterActor.color = Color.fromHex("9cff86");
+        console.log(`${currentMonster.name} has a Weapon `);
+      }
+      console.log(`and ${currentMonster.health} of Health `);
+    });
+  }
 }
