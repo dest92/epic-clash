@@ -7,6 +7,7 @@ const Images = {
 const loader = new ex.Loader();
 const allResources = { ...Images };
 for (const res in allResources) {
+  // @ts-ignore
   loader.addResource(allResources[res]);
 }
 

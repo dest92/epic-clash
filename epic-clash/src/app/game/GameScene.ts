@@ -1,19 +1,18 @@
+"use client";
 import {
   Actor,
   Color,
-  Text,
   Font,
   FontUnit,
   TextAlign,
   vec,
   Scene,
   Engine,
-  Input,
   Label,
+  SceneActivationContext,
 } from "excalibur";
 import { Warrior, Mage, Monster, Weapon, ICharacter } from "./characters";
 import { createCharacters } from "./actors";
-
 export class GameScene extends Scene {
   private heroes: Actor[] = [];
   private heroCharacters: ICharacter[] = [];
@@ -24,9 +23,41 @@ export class GameScene extends Scene {
   private currentActor: Actor | null = null; // The actor that currently has control
   private currentTurn: boolean = true; // true for heroes' turn, false for monsters' turn
 
-  onInitialize(engine: Engine) {
-    const characters = createCharacters(2, 3); // 2 héroes y 3 monstruos
+  private checkGameOver() {
+    console.log("Checking game over...");
+    if (this.heroCharacters.length === 0) {
+      const label = this.createGameOverLabel("Monsters win! Game Over.");
+      this.engine.add(label);
+      // setTimeout(() => this.engine.goToScene("gameOver"), 5000);
+    } else if (this.monsterCharacters.length === 0) {
+      const label = this.createGameOverLabel("Heroes win! Game Over.");
+      this.engine.add(label);
+      // setTimeout(() => this.engine.goToScene("gameOver"), 5000);
+    }
+  }
 
+  private createGameOverLabel = (message: string) => {
+    const gameOverLabel = new Label({
+      text: message,
+      color: Color.White,
+      pos: vec(this.engine.halfDrawWidth, this.engine.halfDrawHeight),
+      font: new Font({
+        family: "PressStart2P",
+        size: 24,
+        unit: FontUnit.Px,
+        textAlign: TextAlign.Center,
+      }),
+    });
+
+    return gameOverLabel;
+  };
+
+  onActivate(_context: SceneActivationContext<unknown>): void {
+    console.log("GameScene activated");
+  }
+
+  onInitialize(engine: Engine) {
+    const characters = createCharacters(1, 1);
     const attackButton = new Actor({
       pos: vec(engine.halfDrawWidth + 330, engine.halfDrawHeight + 170),
       width: 130,
@@ -108,25 +139,12 @@ export class GameScene extends Scene {
         this.heroes.push(actor);
         this.heroCharacters.push(character);
       }
-
       this.add(actor);
+      console.log(character.name);
+
       this.currentTurn = true; // Start the heroes' turn
       this.currentActor = this.heroes[0]; // Start with the first hero
     });
-
-    // Velocidad a la que se moverán los héroes
-
-    engine.input.keyboard.on("press", (evt) => {
-      // Lógica para atacar a un monstruo con la tecla "C"
-      if (evt.key === Input.Keys.C) {
-        if (this.currentTurn) {
-          this.performHeroAttack();
-        } else {
-          this.performMonsterAttack();
-        }
-      }
-    });
-
     this.add(attackButton);
     this.add(changeHeroButton);
     this.add(labelAttack);
@@ -135,12 +153,6 @@ export class GameScene extends Scene {
 
   update(engine: Engine, delta: number) {
     super.update(engine, delta);
-
-    // //If it's the current actor's turn
-    // if (this.currentActor) {
-    //   // Allow the actor to perform an action
-    //   this.currentActor.rotation = 1;
-    // }
   }
 
   changeTurn() {
@@ -164,16 +176,17 @@ export class GameScene extends Scene {
   }
 
   scheduleMonsterAttack() {
-    // Espera un breve período antes de realizar el ataque del monstruo
+    this.checkGameOver();
+
     setTimeout(() => {
       this.performMonsterAttack();
     }, 2000); // Espera 1 segundo antes de que el monstruo ataque
   }
 
   performHeroAttack() {
-    this.heroes.map((currentHero, index) => {
-      const currentHeroCharacter = this.heroCharacters[index];
-      if (!currentHero || !currentHeroCharacter) return;
+    this.heroCharacters.map((currentHero, index) => {
+      const currentHeroCharacter = currentHero;
+      if (!currentHero) return;
 
       console.log(`-> ${currentHeroCharacter.name}${index} is attacking...`);
 
@@ -192,11 +205,10 @@ export class GameScene extends Scene {
       if (monsterCharacter.health <= 0) {
         monsterActor.color = Color.Gray;
         monsterActor.kill();
-        if (monsterActor.isKilled()) {
-          this.monsters.splice(randomIndex, 1);
-          this.monsterCharacters.splice(randomIndex, 1);
-          console.log("monsters alive " + this.monsterCharacters.length);
-        }
+        // Elimina el monstruo de la lista después de que haya sido "muerto"
+        this.monsters.splice(randomIndex, 1);
+        this.monsterCharacters.splice(randomIndex, 1);
+        this.checkGameOver();
       }
     });
 
@@ -228,7 +240,7 @@ export class GameScene extends Scene {
         if (heroActor.isKilled()) {
           this.heroes.splice(randomIndex, 1);
           this.heroCharacters.splice(randomIndex, 1);
-          console.log("heros alive " + this.heroCharacters.length);
+          this.checkGameOver();
         }
       }
     });

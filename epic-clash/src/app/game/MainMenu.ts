@@ -1,4 +1,6 @@
 // MainMenuScene.ts
+"use client";
+
 import {
   Actor,
   Color,
@@ -10,10 +12,15 @@ import {
   FontUnit,
   Label,
   TextAlign,
+  SceneActivationContext,
 } from "excalibur";
 import { loader, Images } from "./resources";
+import { GameScene } from "./GameScene";
 
 export class MainMenuScene extends Scene {
+  onActivate(_context: SceneActivationContext<unknown>): void {
+    console.log("MainMenuScene activated");
+  }
   onInitialize(engine: Engine) {
     // const spriteSheetImage = new ImageSource("../assets/images/background.png");
 
@@ -44,6 +51,7 @@ export class MainMenuScene extends Scene {
     });
 
     // Habilitar la captura de eventos de puntero para el botón de Play
+    // @ts-ignore
     playButton.enableCapturePointer = true;
 
     playButton.on("pointerenter", () => {
@@ -55,6 +63,7 @@ export class MainMenuScene extends Scene {
     });
 
     playButton.on("pointerup", () => {
+      engine.add("game", new GameScene());
       engine.goToScene("game");
     });
 
