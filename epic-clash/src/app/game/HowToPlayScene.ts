@@ -9,38 +9,20 @@ import {
   FontUnit,
   Actor,
   Sound,
-  SceneActivationContext,
 } from "excalibur";
 import { Images, loader } from "./resources";
-import { backgroundSounds } from "./MainMenu";
 
-export const gameOverSound = new Sound("../assets/sounds/dead.wav");
-
-export class GameOverScene extends Scene {
-  onActivate(_context: SceneActivationContext<unknown>): void {}
+export class HowToPlayScene extends Scene {
   onInitialize(engine: Engine) {
-    backgroundSounds.stop();
     const background = new Actor({
       pos: vec(engine.halfDrawWidth, engine.halfDrawHeight),
       width: engine.drawWidth + 100,
       height: engine.drawHeight + 100,
     });
 
-    background.graphics.use(Images.gameOverImage.toSprite());
-
-    loader.addResource(gameOverSound);
+    background.graphics.use(Images.howToPlay.toSprite());
 
     engine.start(loader);
-
-    if (gameOverSound.isLoaded()) {
-      gameOverSound.play();
-    }
-    gameOverSound.load().then(() => {
-      console.log("loaded");
-      gameOverSound.play();
-      gameOverSound.loop = true;
-      gameOverSound.volume = 0.1;
-    });
 
     // Crear un label para el mensaje de Game Over
 

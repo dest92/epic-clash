@@ -6,7 +6,9 @@ const Images = {
   play: new ex.ImageSource("/assets/images/play.png"),
   back: new ex.ImageSource("/assets/images/back.png"),
   inGame: new ex.ImageSource("/assets/images/inGame.png"),
-
+  howToPlay: new ex.ImageSource("/assets/images/howTo.png"),
+  howToPlayButton: new ex.ImageSource("/assets/images/howButton.png"),
+  papiro: new ex.ImageSource("/assets/images/papiro.png"),
 };
 
 const Sounds = {

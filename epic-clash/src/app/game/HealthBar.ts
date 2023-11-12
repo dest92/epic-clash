@@ -1,4 +1,13 @@
-import { Actor, Color, Engine, Font, FontUnit, Label, Vector } from "excalibur";
+import {
+  Actor,
+  Color,
+  Engine,
+  Font,
+  FontUnit,
+  Label,
+  Scene,
+  Vector,
+} from "excalibur";
 
 class HealthBar extends Actor {
   private label: Label;
@@ -47,6 +56,10 @@ class HealthBar extends Actor {
   // Sobrescribir el método onInitialize para agregar la etiqueta al motor
   onInitialize(engine: Engine) {
     engine.add(this.label);
+  }
+
+  onPostKill(_scene: Scene<unknown>): void {
+    this.label.kill();
   }
 }
 
