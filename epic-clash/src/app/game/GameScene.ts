@@ -64,11 +64,11 @@ export class GameScene extends Scene {
     if (this.heroCharacters.length === 0) {
       const label = this.createGameOverLabel("Monsters win! Game Over.");
       this.engine.add(label);
-      setTimeout(() => this.engine.goToScene("gameOver"), 2000);
+      setTimeout(() => this.engine.goToScene("gameOver"), 4000);
     } else if (this.monsterCharacters.length === 0) {
       const label = this.createGameOverLabel("Heroes win! Game Over.");
       this.engine.add(label);
-      setTimeout(() => this.engine.goToScene("gameOver"), 2000);
+      setTimeout(() => this.engine.goToScene("gameOver"), 4000);
     }
   }
 
@@ -131,7 +131,7 @@ export class GameScene extends Scene {
 
     engine.start(loader);
     this.add(background);
-    const characters = createCharacters(2, 3);
+    const characters = createCharacters(3, 3);
     const attackButton = new Actor({
       pos: vec(engine.halfDrawWidth + 330, engine.halfDrawHeight + 170),
       width: 130,
@@ -231,12 +231,17 @@ export class GameScene extends Scene {
         this.heroHealthBars.push(healthBar);
       }
       this.add(actor);
-      console.log(character.name);
 
       this.currentTurn = true; // Start the heroes' turn
       this.currentActor = this.heroes[0]; // Start with the first hero
     });
 
+    const papiro = new Actor({
+      pos: vec(engine.halfDrawWidth, engine.halfDrawHeight + 150),
+      width: 200,
+      height: 200,
+    });
+    papiro.graphics.use(Images.papiro.toSprite());
     this.showWeapon();
 
     this.add(attackButton);
@@ -271,41 +276,50 @@ export class GameScene extends Scene {
 
   scheduleMonsterAttack() {
     this.checkGameOver();
-
+    if (this.monsterCharacters.length === 0) return;
     setTimeout(() => {
       this.performMonsterAttack();
     }, 2000); // Espera 1 segundo antes de que el monstruo ataque
   }
-
   performHeroAttack() {
     console.log("-----Heroes turn-----");
-    this.heroes.map((currentHero, index) => {
-      const currentHeroCharacter = this.heroCharacters[index];
-      if (!currentHero || !currentHeroCharacter) return;
 
-      console.log(`-> ${currentHeroCharacter.name}${index} is attacking...`);
+    // Utiliza un bucle for en lugar de map para poder salir del bucle si es necesario
+    for (let index = 0; index < this.heroes.length; index++) {
+      const currentHero = this.heroes[index];
+      const currentHeroCharacter = this.heroCharacters[index];
+      if (!currentHero || !currentHeroCharacter) continue;
+
+      // Asegúrate de que haya monstruos disponibles para atacar
+      if (this.monsters.length === 0) {
+        this.checkGameOver();
+        break; // Sal del bucle si no hay monstruos
+      }
+
+      console.log(`-> ${currentHeroCharacter.name} is attacking...`);
 
       // Genera un índice aleatorio para seleccionar un monstruo al azar
       const randomIndex = Math.floor(Math.random() * this.monsters.length);
-
       const monsterActor = this.monsters[randomIndex];
       const monsterCharacter = this.monsterCharacters[randomIndex];
 
+      // Verifica si el monstruo ya ha sido eliminado
+      if (!monsterActor || !monsterCharacter) continue;
+
       const damage = currentHeroCharacter.attack(monsterCharacter);
-      console.log(
-        `${monsterCharacter.name}:${this.currentMonsterIndex} being attacked`
-      );
       const monsterHealthBar = this.monsterHealthBars[randomIndex];
+
       monsterHealthBar.updateHealth(monsterCharacter.health);
-      console.log(`Damage caused: ${damage}`);
-      console.log(`Monster health: ${monsterCharacter.health}`);
+
       if (monsterCharacter.health <= 0) {
-        monsterActor.color = Color.Gray;
+        console.log(`${monsterCharacter.name} has been defeated.`);
         monsterActor.kill();
-        // Elimina el monstruo de la lista después de que haya sido "muerto"
-        if (monsterActor.isKilled()) {
-          this.monsters.splice(randomIndex, 1);
-          this.monsterCharacters.splice(randomIndex, 1);
+        monsterHealthBar.kill();
+        this.remove(monsterActor);
+        this.remove(monsterHealthBar);
+        this.monsters.splice(randomIndex, 1);
+        this.monsterCharacters.splice(randomIndex, 1);
+        this.monsterHealthBars.splice(randomIndex, 1);
 
           // Drop Weapon del Warrior que muere.
           if (currentHeroCharacter instanceof Warrior && !currentHeroCharacter.hasDroppedWeapon && currentHeroCharacter.hasWeapon()) {
@@ -317,22 +331,34 @@ export class GameScene extends Scene {
             const weapon = currentHeroCharacter.dropWeapon();
             console.log(` weapon with ${weapon?.damage} damage dropped...`);
 
-            // Get an array of all heroes except the one that dropped the weapon
-            const heroesExceptCurrent = this.heroCharacters.filter((hero) => hero !== currentHeroCharacter);
+          // Obtén un array de todos los héroes excepto el que soltó el arma
+          const heroesExceptCurrent = this.heroCharacters.filter(
+            (hero) => hero !== currentHeroCharacter
+          );
 
-            // If there are heroes left, select a random hero to receive the weapon
-            if (heroesExceptCurrent.length > 0) {
-              let randomIndex = Math.floor(Math.random() * heroesExceptCurrent.length);
-              let heroToReceiveWeapon = heroesExceptCurrent[randomIndex];
-              heroToReceiveWeapon.pickWeapon(weapon);
-              console.log(`weapon with ${weapon?.damage} damage dropped and given to ${heroToReceiveWeapon.name}...`);
-            }
+          // Si hay otros héroes, selecciona uno al azar para recibir el arma
+          if (heroesExceptCurrent.length > 0) {
+            let randomHeroIndex = Math.floor(
+              Math.random() * heroesExceptCurrent.length
+            );
+            let heroToReceiveWeapon = heroesExceptCurrent[randomHeroIndex];
+            heroToReceiveWeapon.pickWeapon(weapon);
+            console.log(
+              `Weapon with ${weapon?.damage} damage picked up by ${heroToReceiveWeapon.name}...`
+            );
           }
         }
 
-        this.checkGameOver();
+        // Si se eliminó un monstruo, ajusta el índice si es necesario
+        index = index > 0 ? index - 1 : 0;
+
+        // Verifica si este era el último monstruo
+        if (this.monsters.length === 0) {
+          this.checkGameOver();
+          break; // Sal del bucle si todos los monstruos han sido derrotados
+        }
       }
-    });
+    }
 
     this.changeTurn();
     this.scheduleMonsterAttack();
@@ -357,15 +383,18 @@ export class GameScene extends Scene {
       heroHealthBar.updateHealth(heroCharacter.health);
       console.log(`${heroCharacter.name} being attacked`);
       console.log(`Damage caused: ${damage}`);
-      console.log(`Hero health: ${heroCharacter.health}`);
-      if (heroCharacter.health <= 0) {
+      if (heroCharacter.health < 1) {
+        if (heroHealthBar) {
+          heroHealthBar.kill();
+          this.remove(heroHealthBar);
+        }
         heroActor.color = Color.Gray;
-        console.log(` ///Has Died: ${heroCharacter.name}...`);
         heroActor.kill();
+        heroHealthBar.kill();
         if (heroActor.isKilled()) {
           this.heroes.splice(randomIndex, 1);
           this.heroCharacters.splice(randomIndex, 1);
-          console.log("heros alive " + this.heroCharacters.length);
+          this.heroHealthBars.splice(randomIndex, 1);
 
           if (currentMonsterCharacter instanceof Monster && !currentMonsterCharacter.   hasDroppedWeapon && currentMonsterCharacter.hasWeapon()) {
             // console.log(`currentHeroCharacter instanceof Warrior: ${currentMonsterCharacter instanceof Monster}`);
@@ -391,6 +420,13 @@ export class GameScene extends Scene {
       }
     });
 
+    // Verifica si este era el último monstruo
+    if (this.heroCharacters.length === 0) {
+      // Maneja el caso de que todos los monstruos han sido derrotados
+      this.checkGameOver();
+      // No continúes con el cambio de turno o programar ataques si el juego ha terminado
+      return;
+    }
     this.changeTurn();
   }
 

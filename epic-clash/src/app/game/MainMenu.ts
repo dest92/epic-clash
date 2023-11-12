@@ -60,10 +60,6 @@ export class MainMenuScene extends Scene {
       playButton.color = Color.Yellow;
     });
 
-    // playButton.on("pointerleave", () => {
-    //   playButton.color = Color.Gray;
-    // });
-
     playButton.on("pointerup", () => {
       if (backgroundSounds.isLoaded() && !backgroundSounds.isPlaying()) {
         backgroundSounds.play();
@@ -72,7 +68,23 @@ export class MainMenuScene extends Scene {
       engine.goToScene("game");
     });
 
+    const howToPlayButton = new Actor({
+      pos: vec(engine.halfDrawWidth, engine.halfDrawHeight + 170),
+      width: 300, // Ancho del botón
+      height: 40, // Altura del botón
+      color: Color.Gray, // Color del botón
+    });
+
+    howToPlayButton.graphics.use(Images.howToPlayButton.toSprite());
+    // @ts-ignore
+    howToPlayButton.enableCapturePointer = true;
+
+    howToPlayButton.on("pointerup", () => {
+      engine.goToScene("howToPlay");
+    });
+
     this.add(background);
     this.add(playButton);
+    this.add(howToPlayButton);
   }
 }
