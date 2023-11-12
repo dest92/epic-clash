@@ -15,6 +15,7 @@ export interface ICharacter {
   weapon?: Weapon;
   attack(target: ICharacter): number;
   hasWeapon(): boolean;
+  pickWeapon(weapon: Weapon | undefined): void;
 }
 
 // Interfaz para los héroes
@@ -32,7 +33,7 @@ export abstract class Hero implements IHero {
   name: string;
   health: number = 100;
   weapon?: Weapon;
-
+  hasDroppedWeapon: boolean = false;
   constructor(name: string, weapon?: Weapon) {
     this.name = name;
     this.weapon = weapon;
@@ -43,11 +44,15 @@ export abstract class Hero implements IHero {
   dropWeapon(): Weapon | undefined {
     const droppedWeapon = this.weapon;
     this.weapon = undefined;
+    this.hasDroppedWeapon = true; // con este método, esto sirve para que no se vuelva a droppear
     return droppedWeapon;
   }
 
   hasWeapon(): boolean {
     return this.weapon !== undefined;
+  }
+  pickWeapon(weapon: Weapon): void {
+    this.weapon = weapon;
   }
 }
 
@@ -79,13 +84,14 @@ export class Mage extends Hero {
 // Clase Monster
 export class Monster implements IMonster {
   name: string;
-
+  public hasDroppedWeapon: boolean;
   constructor(
     name: string,
     public health: number,
     public weapon: Weapon = new Weapon(1)
   ) {
     this.name = name;
+    this.hasDroppedWeapon = false;
   }
 
   attack(target: ICharacter): number {
@@ -98,6 +104,7 @@ export class Monster implements IMonster {
     if (this.weapon) {
       const droppedWeapon = this.weapon;
       this.weapon = new Weapon(0);
+      this.hasDroppedWeapon = true;
       return droppedWeapon;
     }
     return undefined;
@@ -105,5 +112,9 @@ export class Monster implements IMonster {
 
   hasWeapon(): boolean {
     return this.weapon.damage > 1;
+  }
+
+  pickWeapon(weapon: Weapon): void { 
+    this.weapon.damage = weapon.damage;
   }
 }
