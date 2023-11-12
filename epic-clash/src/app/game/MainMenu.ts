@@ -1,4 +1,6 @@
 // MainMenuScene.ts
+"use client";
+
 import {
   Actor,
   Color,
@@ -10,10 +12,20 @@ import {
   FontUnit,
   Label,
   TextAlign,
+  Sound,
+  SceneActivationContext,
 } from "excalibur";
 import { loader, Images } from "./resources";
+import { GameScene } from "./GameScene";
+import { gameOverSound } from "./GameOverScene";
+export const backgroundSounds = new Sound("../assets/sounds/title.wav");
 
 export class MainMenuScene extends Scene {
+  onActivate(_context: SceneActivationContext<unknown>): void {
+    if (gameOverSound.isLoaded()) {
+      gameOverSound.stop();
+    }
+  }
   onInitialize(engine: Engine) {
     // const spriteSheetImage = new ImageSource("../assets/images/background.png");
 
@@ -25,54 +37,42 @@ export class MainMenuScene extends Scene {
 
     background.graphics.use(Images.backgroundImage.toSprite());
 
+    loader.addResource(backgroundSounds);
+
     engine.start(loader);
 
-    const text = new Text({
-      text: "EPIC CLASH",
-      color: Color.Orange,
-      font: new Font({ size: 48, unit: FontUnit.Px, family: "PressStart2P" }),
-    });
-
-    const actorText = new Actor({ pos: vec(engine.halfDrawWidth, 150) });
-    actorText.graphics.add(text);
+    backgroundSounds.loop = true;
+    backgroundSounds.volume = 0.1;
 
     const playButton = new Actor({
-      pos: vec(engine.halfDrawWidth, engine.halfDrawHeight),
+      pos: vec(engine.halfDrawWidth, engine.halfDrawHeight + 15),
       width: 150, // Ancho del botón
       height: 40, // Altura del botón
       color: Color.Gray, // Color del botón
     });
 
     // Habilitar la captura de eventos de puntero para el botón de Play
+    // @ts-ignore
     playButton.enableCapturePointer = true;
 
+    playButton.graphics.use(Images.play.toSprite());
     playButton.on("pointerenter", () => {
       playButton.color = Color.Yellow;
     });
 
-    playButton.on("pointerleave", () => {
-      playButton.color = Color.Gray;
-    });
+    // playButton.on("pointerleave", () => {
+    //   playButton.color = Color.Gray;
+    // });
 
     playButton.on("pointerup", () => {
+      if (backgroundSounds.isLoaded() && !backgroundSounds.isPlaying()) {
+        backgroundSounds.play();
+      }
+      engine.add("game", new GameScene());
       engine.goToScene("game");
-    });
-
-    const label = new Label({
-      font: new Font({
-        family: "PressStart2P",
-        size: 24,
-        unit: FontUnit.Px,
-        textAlign: TextAlign.Center,
-      }),
-      text: "Play",
-      pos: vec(engine.halfDrawWidth, engine.halfDrawHeight + 10), // Ajustar la posición
-      color: Color.Black,
     });
 
     this.add(background);
     this.add(playButton);
-    this.add(label);
-    this.add(actorText);
   }
 }
