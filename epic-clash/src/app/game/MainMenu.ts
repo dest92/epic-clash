@@ -12,15 +12,11 @@ import {
   FontUnit,
   Label,
   TextAlign,
-  SceneActivationContext,
 } from "excalibur";
 import { loader, Images } from "./resources";
 import { GameScene } from "./GameScene";
 
 export class MainMenuScene extends Scene {
-  onActivate(_context: SceneActivationContext<unknown>): void {
-    console.log("MainMenuScene activated");
-  }
   onInitialize(engine: Engine) {
     // const spriteSheetImage = new ImageSource("../assets/images/background.png");
 
@@ -34,17 +30,8 @@ export class MainMenuScene extends Scene {
 
     engine.start(loader);
 
-    const text = new Text({
-      text: "EPIC CLASH",
-      color: Color.Orange,
-      font: new Font({ size: 48, unit: FontUnit.Px, family: "PressStart2P" }),
-    });
-
-    const actorText = new Actor({ pos: vec(engine.halfDrawWidth, 150) });
-    actorText.graphics.add(text);
-
     const playButton = new Actor({
-      pos: vec(engine.halfDrawWidth, engine.halfDrawHeight),
+      pos: vec(engine.halfDrawWidth, engine.halfDrawHeight+15),
       width: 150, // Ancho del botón
       height: 40, // Altura del botón
       color: Color.Gray, // Color del botón
@@ -54,13 +41,14 @@ export class MainMenuScene extends Scene {
     // @ts-ignore
     playButton.enableCapturePointer = true;
 
+    playButton.graphics.use(Images.play.toSprite());
     playButton.on("pointerenter", () => {
       playButton.color = Color.Yellow;
     });
 
-    playButton.on("pointerleave", () => {
-      playButton.color = Color.Gray;
-    });
+    // playButton.on("pointerleave", () => {
+    //   playButton.color = Color.Gray;
+    // });
 
     playButton.on("pointerup", () => {
       engine.add("game", new GameScene());
@@ -81,7 +69,5 @@ export class MainMenuScene extends Scene {
 
     this.add(background);
     this.add(playButton);
-    this.add(label);
-    this.add(actorText);
   }
 }

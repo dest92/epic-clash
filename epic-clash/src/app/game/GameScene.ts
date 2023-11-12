@@ -28,11 +28,11 @@ export class GameScene extends Scene {
     if (this.heroCharacters.length === 0) {
       const label = this.createGameOverLabel("Monsters win! Game Over.");
       this.engine.add(label);
-      // setTimeout(() => this.engine.goToScene("gameOver"), 5000);
+      setTimeout(() => this.engine.goToScene("gameOver"), 2000);
     } else if (this.monsterCharacters.length === 0) {
       const label = this.createGameOverLabel("Heroes win! Game Over.");
       this.engine.add(label);
-      // setTimeout(() => this.engine.goToScene("gameOver"), 5000);
+      setTimeout(() => this.engine.goToScene("gameOver"), 2000);
     }
   }
 

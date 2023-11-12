@@ -37,9 +37,9 @@ export default function GamePage() {
     <>
       <div className="fondo-about">
         <Layout home title>
-          <div className="flex justify-center items-center mt-20 mb-10">
+          <div className="flex justify-center items-center h-screen">
             <div className="border-8 border-stone-900">
-              <canvas ref={canvasRef} className="align-middle" />
+              <canvas ref={canvasRef} className="m-auto" />
             </div>
           </div>
         </Layout>
