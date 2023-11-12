@@ -10,8 +10,12 @@ import {
   Engine,
   Label,
   SceneActivationContext,
+  Vector,
 } from "excalibur";
 import { Warrior, Mage, Monster, Weapon, ICharacter } from "./characters";
+import { Images, loader } from "./resources";
+import HealthBar from "./HealthBar";
+
 import { createCharacters } from "./actors";
 export class GameScene extends Scene {
   private heroes: Actor[] = [];
@@ -22,6 +26,8 @@ export class GameScene extends Scene {
   private currentMonsterIndex: number = 0; // Índice del héroe actualmente seleccionado
   private currentActor: Actor | null = null; // The actor that currently has control
   private currentTurn: boolean = true; // true for heroes' turn, false for monsters' turn
+  private heroHealthBars: HealthBar[] = [];
+  private monsterHealthBars: HealthBar[] = [];
 
   private checkGameOver() {
     console.log("Checking game over...");
@@ -57,6 +63,16 @@ export class GameScene extends Scene {
   }
 
   onInitialize(engine: Engine) {
+    const background = new Actor({
+      pos: vec(engine.halfDrawWidth, engine.halfDrawHeight),
+      width: engine.drawWidth + 100,
+      height: engine.drawHeight + 100,
+    });
+
+    background.graphics.use(Images.inGame.toSprite());
+
+    engine.start(loader);
+    this.add(background);
     const characters = createCharacters(1, 1);
     const attackButton = new Actor({
       pos: vec(engine.halfDrawWidth + 330, engine.halfDrawHeight + 170),
@@ -132,12 +148,20 @@ export class GameScene extends Scene {
         height: 50,
       });
 
+      const healthBar = new HealthBar(
+        100,
+        character.health,
+        new Vector(actor.pos.x, actor.pos.y - 50)
+      );
+      this.add(healthBar);
       if (character instanceof Monster) {
         this.monsters.push(actor);
         this.monsterCharacters.push(character);
+        this.monsterHealthBars.push(healthBar);
       } else {
         this.heroes.push(actor);
         this.heroCharacters.push(character);
+        this.heroHealthBars.push(healthBar);
       }
       this.add(actor);
       console.log(character.name);
@@ -200,6 +224,8 @@ export class GameScene extends Scene {
       console.log(
         `${monsterCharacter.name} ${this.currentMonsterIndex} being attacked`
       );
+      const monsterHealthBar = this.monsterHealthBars[randomIndex];
+      monsterHealthBar.updateHealth(monsterCharacter.health);
       console.log(`Damage caused: ${damage}`);
       console.log(`Monster health: ${monsterCharacter.health}`);
       if (monsterCharacter.health <= 0) {
@@ -231,6 +257,8 @@ export class GameScene extends Scene {
       const heroCharacter = this.heroCharacters[randomIndex];
 
       const damage = currentMonsterCharacter.attack(heroCharacter);
+      const heroHealthBar = this.heroHealthBars[randomIndex];
+    heroHealthBar.updateHealth(heroCharacter.health);
       console.log(`${heroCharacter.name} being attacked`);
       console.log(`Damage caused: ${damage}`);
       console.log(`Hero health: ${heroCharacter.health}`);

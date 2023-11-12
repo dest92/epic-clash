@@ -5,6 +5,8 @@ const Images = {
   gameOverImage: new ex.ImageSource("/assets/images/gameOver.png"),
   play: new ex.ImageSource("/assets/images/play.png"),
   back: new ex.ImageSource("/assets/images/back.png"),
+  inGame: new ex.ImageSource("/assets/images/inGame.png"),
+
 };
 
 const Sounds = {
