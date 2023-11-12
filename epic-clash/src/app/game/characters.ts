@@ -27,7 +27,6 @@ export interface IHero extends ICharacter {
 // Interfaz para los monstruos
 export interface IMonster extends ICharacter {
   dropWeapon(): Weapon | undefined;
-  isAlive(): boolean;
 }
 
 // Clase abstracta Hero
@@ -35,7 +34,7 @@ export abstract class Hero implements IHero {
   name: string;
   health: number = 100;
   weapon?: Weapon;
-
+  hasDroppedWeapon: boolean = false;
   constructor(name: string, weapon?: Weapon) {
     this.name = name;
     this.weapon = weapon;
@@ -46,6 +45,7 @@ export abstract class Hero implements IHero {
   dropWeapon(): Weapon | undefined {
     const droppedWeapon = this.weapon;
     this.weapon = undefined;
+    this.hasDroppedWeapon = true; // con este método, esto sirve para que no se vuelva a droppear
     return droppedWeapon;
   }
 
@@ -85,13 +85,14 @@ export class Mage extends Hero {
 // Clase Monster
 export class Monster implements IMonster {
   name: string;
-
+  public hasDroppedWeapon: boolean;
   constructor(
     name: string,
     public health: number,
     public weapon: Weapon = new Weapon(1)
   ) {
     this.name = name;
+    this.hasDroppedWeapon = false;
   }
 
   attack(target: ICharacter): number {
@@ -104,6 +105,7 @@ export class Monster implements IMonster {
     if (this.weapon) {
       const droppedWeapon = this.weapon;
       this.weapon = new Weapon(0);
+      this.hasDroppedWeapon = true;
       return droppedWeapon;
     }
     return undefined;
@@ -111,8 +113,5 @@ export class Monster implements IMonster {
 
   hasWeapon(): boolean {
     return this.weapon.damage > 1;
-  }
-  isAlive(): boolean {
-    return this.health >= 0
   }
 }

@@ -139,15 +139,33 @@ export class GameScene extends Scene {
     super.update(engine, delta);
     // this.currentActor = this.heroes[this.currentHeroIndex];
     
-    // if (currentHeroCharacter.health <= 0 || currentHero instanceof Warrior) {
-    //   this.heroWarriors[index].dropWeapon();
-    //   console.log(`${this.heroWarriors[index].name} dropped a weapon... `)
-    // }
-    // if (currentMonster.health <= 0 || currentMonster instanceof Monster) {
-    //   const droppedWeapon = this.monsterMonsters[index].dropWeapon();
-    //    console.log(`${this.monsterMonsters[index].name} dropped a weapon... `)
-    // }
-    
+//     // Check if the current hero's health is 0
+//  if (this.heroCharacters[this.currentHeroIndex].health <= 0) {
+//   // Create the button
+//   const heroDiedButton = new Actor({
+//     pos: vec(engine.halfDrawWidth + 300, engine.halfDrawHeight + 90),
+//     width: 180,
+//     height: 30,
+//     color: Color.Blue,
+//   });
+
+//    // Add event listeners to the button
+//    heroDiedButton.on("pointerenter", () => {
+//     heroDiedButton.color = Color.White;
+//   });
+
+//   heroDiedButton.on("pointerleave", () => {
+//     heroDiedButton.color = Color.Red;
+//   });
+
+//   heroDiedButton.on("pointerup", () => {
+//     // Perform an action when the button is clicked
+//     // For example, you can remove the button from the scene
+//     heroDiedButton.kill();
+//   });
+//   // Add the button to the scene
+//   this.add(heroDiedButton);
+//   }
    
   }
 
@@ -166,15 +184,6 @@ export class GameScene extends Scene {
       // Establece el actor actual como el monstruo actual
       this.currentActor = this.monsters[this.currentMonsterIndex];
     }
-    // this.monsterCharacters.map(character => {
-    //   if (character instanceof Monster && character.isAlive()! && character.hasWeapon()) {
-    //     console.log(` ${character.name} dropped a weapon...`);
-    //     const weapon = character.dropWeapon();
-        
-    //   } 
-     
-
-    // });
     
     // Cambia el turno
     this.currentTurn = !this.currentTurn;
@@ -188,6 +197,7 @@ export class GameScene extends Scene {
   }
 
   performHeroAttack() {
+    console.log("-----Heroes turn-----");
     this.heroes.map((currentHero, index) => {
       const currentHeroCharacter = this.heroCharacters[index];
       if (!currentHero || !currentHeroCharacter) return;
@@ -202,7 +212,7 @@ export class GameScene extends Scene {
 
       const damage = currentHeroCharacter.attack(monsterCharacter);
       console.log(
-        `${monsterCharacter.name} ${this.currentMonsterIndex} being attacked`
+        `${monsterCharacter.name}:${this.currentMonsterIndex} being attacked`
       );
       console.log(`Damage caused: ${damage}`);
       console.log(`Monster health: ${monsterCharacter.health}`);
@@ -216,6 +226,14 @@ export class GameScene extends Scene {
           
         }
       }
+     // Drop Weapon del Hero que muere.
+     if (currentHeroCharacter instanceof Warrior && !currentHeroCharacter.hasDroppedWeapon && currentHeroCharacter.health >= 0 && currentHeroCharacter.hasWeapon()) {
+      console.log(` *********${currentHeroCharacter.name} dropped a weapon...`);
+      const weapon = currentHeroCharacter.dropWeapon();
+      console.log(` weapon with ${weapon?.damage} damage dropped...`);
+    } 
+   
+      
   
     });
 
@@ -243,7 +261,7 @@ export class GameScene extends Scene {
       console.log(`Hero health: ${heroCharacter.health}`);
       if (heroCharacter.health <= 0) {
         heroActor.color = Color.Gray;
-
+        console.log(` ///Has Died: ${heroCharacter.name}...`);
         heroActor.kill();
         if (heroActor.isKilled()) {
           this.heroes.splice(randomIndex, 1);
@@ -252,11 +270,11 @@ export class GameScene extends Scene {
         }
       }
      
-        if (currentMonsterCharacter instanceof Monster && currentMonsterCharacter.isAlive()! && currentMonsterCharacter.hasWeapon()) {
-          console.log(` ${currentMonsterCharacter.name} dropped a weapon...`);
+      // Drop Weapon del Monster que muere.
+        if (currentMonsterCharacter instanceof Monster && !currentMonsterCharacter.hasDroppedWeapon && currentMonsterCharacter.health >= 0 && currentMonsterCharacter.hasWeapon()) {
+          console.log(` *********${currentMonsterCharacter.name} dropped a weapon...`);
           const weapon = currentMonsterCharacter.dropWeapon();
           console.log(` weapon with ${weapon?.damage} damage dropped...`);
-
         } 
        
   
@@ -273,7 +291,7 @@ export class GameScene extends Scene {
  
     const heroActor = this.heroes[index]
     if (currentHero.hasWeapon()) {
-      heroActor.color = Color.Gray;
+      heroActor.color = Color.fromHex("fa7c5f");
       console.log(`${currentHero.name} has a Weapon `)
     }
 
@@ -281,7 +299,7 @@ export class GameScene extends Scene {
   this.monsterCharacters.map((currentMonster, index) => {
     const monsterActor = this.monsters[index];
     if (currentMonster.hasWeapon()) {
-      monsterActor.color = Color.Gray;
+      monsterActor.color = Color.fromHex("9cff86");
       console.log(`${currentMonster.name} has a Weapon `)
     }
    });
