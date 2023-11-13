@@ -215,7 +215,7 @@ export class GameScene extends Scene {
 
     let posCount = 0;
     let monsterPosCount = 0;
-    let posY = 0;
+
     characters.forEach((character) => {
       const actor = new Actor({
         pos: vec(
@@ -234,6 +234,7 @@ export class GameScene extends Scene {
           graphic.height = 300;
           actor.scale = new Vector(2, 2);
           actor.graphics.use(graphic.toAnimation(100));
+          actor.graphics.add("warrior", graphic.toAnimation(100));
         } else {
           //Random asset
         }
@@ -244,7 +245,17 @@ export class GameScene extends Scene {
         );
       } else {
         const assets = [Monsters.demon, Monsters.beast, Monsters.ghost];
-        const monsterAsset = assets[getRandomInt(0, assets.length - 1)];
+        const attackAssets = [
+          Monsters.demonAttack,
+          Monsters.beastAttack,
+          Monsters.ghostAttack,
+        ];
+
+        const randomIndex = getRandomInt(0, assets.length - 1);
+
+        // Usa el mismo índice para ambos, porque están en orden correspondiente
+        const monsterAsset = assets[randomIndex];
+        const attackGraphic = attackAssets[randomIndex];
         const graphic = monsterAsset;
 
         graphic.width = 300;
@@ -253,7 +264,9 @@ export class GameScene extends Scene {
           monsterAsset === Monsters.demon ? 1 : 2,
           monsterAsset === Monsters.demon ? 1 : 2
         );
+        actor.graphics.add("idle", graphic.toAnimation(100));
         actor.graphics.use(graphic.toAnimation(120));
+        actor.graphics.add("attack", attackGraphic.toAnimation(120));
         actor.pos = vec(
           engine.halfDrawWidth + 300 - monsterPosCount,
           monsterAsset === Monsters.ghost || monsterAsset === Monsters.demon
@@ -459,6 +472,10 @@ export class GameScene extends Scene {
       if (!heroActor || !heroCharacter) continue;
 
       const damage = currentMonsterCharacter.attack(heroCharacter);
+      currentMonster.graphics.use("attack");
+      setTimeout(() => {
+        currentMonster.graphics.use("idle");
+      }, 1000);
       const heroHealthBar = this.heroHealthBars[randomIndex];
       heroHealthBar.updateHealth(heroCharacter.health);
 

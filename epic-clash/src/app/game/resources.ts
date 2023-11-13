@@ -21,6 +21,18 @@ const Monsters = {
   beast: new ex.Gif("/assets/images/beast-idle.gif", ex.Color.Transparent),
   demon: new ex.Gif("/assets/images/demon-idle.gif", ex.Color.Transparent),
   ghost: new ex.Gif("/assets/images/ghost-idle.gif", ex.Color.Transparent),
+  beastAttack: new ex.Gif(
+    "/assets/images/beast-attack.gif",
+    ex.Color.Transparent
+  ),
+  demonAttack: new ex.Gif(
+    "/assets/images/demon-attack.gif",
+    ex.Color.Transparent
+  ),
+  ghostAttack: new ex.Gif(
+    "/assets/images/ghost-attack.gif",
+    ex.Color.Transparent
+  ),
 };
 
 const Sounds = {
