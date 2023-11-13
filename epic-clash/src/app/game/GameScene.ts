@@ -16,7 +16,12 @@ import { Warrior, Mage, Monster, Weapon, ICharacter } from "./characters";
 import { Images, loader } from "./resources";
 import HealthBar from "./HealthBar";
 
-import { createCharacters, getRandomName } from "./actors";
+import {
+  createCharacters,
+  getRandomInt,
+  getRandomName,
+  hasWeapon,
+} from "./actors";
 export class GameScene extends Scene {
   private heroes: Actor[] = [];
   private heroCharacters: ICharacter[] = [];
@@ -46,11 +51,15 @@ export class GameScene extends Scene {
     }
     newHero.name = getRandomName(isMage ? "wizard" : "warrior");
     newHero.health = currentHero.health;
-    newHero.weapon = currentHero.weapon; // Asegúrate de que el mago no reciba un arma
+
     console.log(`newHero: ${newHero.name}`);
     // Si el nuevo héroe es un mago, asegúrate de que no tenga un arma
     if (newHero instanceof Mage) {
       newHero.weapon = undefined;
+    } else {
+      newHero.weapon = hasWeapon()
+        ? new Weapon(getRandomInt(1, 10))
+        : undefined; 
     }
 
     // Actualiza la referencia en el arreglo de héroes
