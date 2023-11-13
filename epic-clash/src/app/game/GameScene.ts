@@ -227,11 +227,16 @@ export class GameScene extends Scene {
       });
 
       if (character instanceof Warrior || character instanceof Mage) {
-        const graphic = Warriors.warrior;
-        graphic.width = 300;
-        graphic.height = 300;
-        actor.scale = new Vector(2, 2);
-        actor.graphics.use(graphic.toAnimation(100));
+        if (character instanceof Warrior) {
+          const graphic = Warriors.warrior;
+          graphic.width = 300;
+          graphic.height = 300;
+          actor.scale = new Vector(2, 2);
+          actor.graphics.use(graphic.toAnimation(100));
+        }else{
+
+        }
+
         actor.pos = vec(
           engine.halfDrawWidth - 270 + posCount,
           engine.halfDrawHeight + 85
