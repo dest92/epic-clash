@@ -164,7 +164,7 @@ export class GameScene extends Scene {
     });
 
     const changeHeroButton = new Actor({
-      pos: vec(engine.halfDrawWidth + 300, engine.halfDrawHeight + 120),
+      pos: vec(engine.halfDrawWidth + 150, engine.halfDrawHeight + 170),
       width: 180,
       height: 30,
       color: Color.Green,
@@ -200,7 +200,7 @@ export class GameScene extends Scene {
         textAlign: TextAlign.Center,
       }),
       text: "Change Hero",
-      pos: vec(engine.halfDrawWidth + 300, engine.halfDrawHeight + 130),
+      pos: vec(engine.halfDrawWidth + 150, engine.halfDrawHeight + 175),
       color: Color.Black,
     });
 
@@ -303,7 +303,7 @@ export class GameScene extends Scene {
 
       const damage = currentHeroCharacter.attack(monsterCharacter);
 
-      if (this.monsterCharacters[index]) {
+      if (this.monsterCharacters[randomIndex]) {
         const labelmessage = new Label({
           font: new Font({
             family: "PressStart2P",
@@ -311,7 +311,7 @@ export class GameScene extends Scene {
             unit: FontUnit.Px,
             textAlign: TextAlign.Center,
           }),
-          text: `Causó: ${damage} de daño a ${this.monsterCharacters[index].name}`,
+          text: `Causó: ${damage} de daño a ${monsterCharacter.name}`,
           pos: vec(currentHero.pos.x, currentHero.pos.y - 10),
           color: Color.White,
         });
@@ -390,8 +390,6 @@ export class GameScene extends Scene {
       const currentMonsterCharacter = this.monsterCharacters[index];
       const currentMonster = this.monsters[index];
 
-  
-      
       if (!currentMonsterCharacter) continue;
 
       // Asegúrate de que haya héroes disponibles para atacar
@@ -413,10 +411,8 @@ export class GameScene extends Scene {
       const damage = currentMonsterCharacter.attack(heroCharacter);
       const heroHealthBar = this.heroHealthBars[randomIndex];
       heroHealthBar.updateHealth(heroCharacter.health);
-      console.log(`${heroCharacter.name} being attacked`);
-      console.log(`Damage caused: ${damage}`);
 
-      if (this.heroCharacters[index]) {
+      if (this.heroCharacters[randomIndex]) {
         const labelmessage = new Label({
           font: new Font({
             family: "PressStart2P",
@@ -424,7 +420,7 @@ export class GameScene extends Scene {
             unit: FontUnit.Px,
             textAlign: TextAlign.Center,
           }),
-          text: `Causó: ${damage} de daño a ${this.heroCharacters[index].name}`,
+          text: `Causó: ${damage} de daño a ${heroCharacter.name}`,
           pos: vec(currentMonster.pos.x, currentMonster.pos.y - 10),
           color: Color.White,
         });
