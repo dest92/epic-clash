@@ -13,7 +13,7 @@ import {
   Vector,
 } from "excalibur";
 import { Warrior, Mage, Monster, Weapon, ICharacter } from "./characters";
-import { Images, loader } from "./resources";
+import { Images, Warriors, loader } from "./resources";
 import HealthBar from "./HealthBar";
 
 import {
@@ -59,7 +59,7 @@ export class GameScene extends Scene {
     } else {
       newHero.weapon = hasWeapon()
         ? new Weapon(getRandomInt(1, 10))
-        : undefined; 
+        : undefined;
     }
 
     // Actualiza la referencia en el arreglo de héroes
@@ -140,7 +140,7 @@ export class GameScene extends Scene {
 
     engine.start(loader);
     this.add(background);
-    const characters = createCharacters(1, 3);
+    const characters = createCharacters(2, 3);
     const attackButton = new Actor({
       pos: vec(engine.halfDrawWidth + 330, engine.halfDrawHeight + 170),
       width: 130,
@@ -213,6 +213,8 @@ export class GameScene extends Scene {
       color: Color.Black,
     });
 
+    let posCount = 0;
+    let monsterPosCount = 0;
     characters.forEach((character) => {
       const actor = new Actor({
         pos: vec(
@@ -224,10 +226,22 @@ export class GameScene extends Scene {
         height: 50,
       });
 
+      if (character instanceof Warrior || character instanceof Mage) {
+        const graphic = Warriors.warrior;
+        graphic.width = 300;
+        graphic.height = 300;
+        actor.scale = new Vector(2, 2);
+        actor.graphics.use(graphic.toAnimation(100));
+        actor.pos = vec(
+          engine.halfDrawWidth - 270 + posCount,
+          engine.halfDrawHeight + 85
+        );
+      }
+      posCount += 100;
       const healthBar = new HealthBar(
         100,
         character.health,
-        new Vector(actor.pos.x, actor.pos.y - 50)
+        new Vector(actor.pos.x, actor.pos.y - getRandomInt(45, 80))
       );
       this.add(healthBar);
       if (character instanceof Monster) {

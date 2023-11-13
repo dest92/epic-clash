@@ -11,16 +11,22 @@ const Images = {
   papiro: new ex.ImageSource("/assets/images/papiro.png"),
 };
 
+const Warriors = {
+  warrior: new ex.Gif("/assets/images/warrior-idle.gif",ex.Color.Transparent),
+  // warriorAttack: new ex.ImageSource("/assets/images/warriorAttack.png"),
+  // warriorDead: new ex.ImageSource("/assets/images/warriorDead.png"),
+};
+
 const Sounds = {
   backgroundMusic: new ex.Sound("/assets/sounds/title.wav"),
   dead: new ex.Sound("/assets/sounds/dead.wav"),
 };
 
 const loader = new ex.Loader();
-const allResources = { ...Images, ...Sounds };
+const allResources = { ...Images, ...Sounds, ...Warriors };
 for (const res in allResources) {
   // @ts-ignore
   loader.addResource(allResources[res]);
 }
 
-export { loader, Images };
+export { loader, Images, Sounds, Warriors };
