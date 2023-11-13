@@ -321,13 +321,15 @@ export class GameScene extends Scene {
         this.monsterCharacters.splice(randomIndex, 1);
         this.monsterHealthBars.splice(randomIndex, 1);
 
-        // Manejo de armas caídas por héroes
-        if (
-          currentHeroCharacter instanceof Warrior &&
-          currentHeroCharacter.hasWeapon()
-        ) {
-          const weapon = currentHeroCharacter.dropWeapon();
-          console.log(`Weapon with ${weapon?.damage} damage dropped...`);
+          // Drop Weapon del Warrior que muere.
+          if (currentHeroCharacter instanceof Warrior && !currentHeroCharacter.hasDroppedWeapon && currentHeroCharacter.hasWeapon()) {
+            // console.log(`currentHeroCharacter instanceof Warrior: ${currentHeroCharacter instanceof Warrior}`);
+            // console.log(`currentHeroCharacter.hasDroppedWeapon: ${currentHeroCharacter.hasDroppedWeapon}`);
+            // console.log(`currentHeroCharacter.hasWeapon(): ${currentHeroCharacter.hasWeapon()}`);
+
+            console.log(` *********${currentHeroCharacter.name} dropped a weapon...`);
+            const weapon = currentHeroCharacter.dropWeapon();
+            console.log(` weapon with ${weapon?.damage} damage dropped...`);
 
           // Obtén un array de todos los héroes excepto el que soltó el arma
           const heroesExceptCurrent = this.heroCharacters.filter(
@@ -394,31 +396,21 @@ export class GameScene extends Scene {
           this.heroCharacters.splice(randomIndex, 1);
           this.heroHealthBars.splice(randomIndex, 1);
 
-          if (
-            currentMonsterCharacter instanceof Monster &&
-            !currentMonsterCharacter.hasDroppedWeapon &&
-            currentMonsterCharacter.hasWeapon()
-          ) {
-            console.log(
-              ` ****${currentMonsterCharacter.name} dropped a weapon...`
-            );
+          if (currentMonsterCharacter instanceof Monster && !currentMonsterCharacter.hasDroppedWeapon && currentMonsterCharacter.hasWeapon()) {
+          
+            console.log(` ****${currentMonsterCharacter.name} dropped a weapon...`);
             const weapon = currentMonsterCharacter.dropWeapon();
-
+          
             // Get an array of all monsters except the one that dropped the weapon
-            const monstersExceptCurrent = this.monsterCharacters.filter(
-              (monster) => monster !== currentMonsterCharacter
-            );
-
+            const monstersExceptCurrent = this.monsterCharacters.filter(monster => monster !== currentMonsterCharacter);
+            const heroWarriors = this.heroCharacters.filter(character => Warrior);
+            const poolDrop = Array.prototype.concat(monstersExceptCurrent, heroWarriors);
             // If there are monsters left, select a random monster to receive the weapon
-            if (monstersExceptCurrent.length > 0) {
-              let randomIndex = Math.floor(
-                Math.random() * monstersExceptCurrent.length
-              );
-              let monsterToReceiveWeapon = monstersExceptCurrent[randomIndex];
-              monsterToReceiveWeapon.pickWeapon(weapon);
-              console.log(
-                `weapon with ${weapon?.damage} damage dropped and given to ${monsterToReceiveWeapon.name}...`
-              );
+            if (poolDrop.length > 0) {
+              let randomIndex = Math.floor(Math.random() * poolDrop.length);
+              let characterToReceiveWeapon = poolDrop[randomIndex];
+              characterToReceiveWeapon.pickWeapon(weapon);
+              console.log(`weapon with ${weapon?.damage} damage dropped and given to ${characterToReceiveWeapon.name}...`);
             }
           }
         }
