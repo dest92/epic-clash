@@ -13,7 +13,7 @@ import {
   Vector,
 } from "excalibur";
 import { Warrior, Mage, Monster, Weapon, ICharacter } from "./characters";
-import { Images, Warriors, loader } from "./resources";
+import { Images, Warriors, loader, Monsters } from "./resources";
 import HealthBar from "./HealthBar";
 
 import {
@@ -215,6 +215,7 @@ export class GameScene extends Scene {
 
     let posCount = 0;
     let monsterPosCount = 0;
+    let posY = 0;
     characters.forEach((character) => {
       const actor = new Actor({
         pos: vec(
@@ -233,20 +234,40 @@ export class GameScene extends Scene {
           graphic.height = 300;
           actor.scale = new Vector(2, 2);
           actor.graphics.use(graphic.toAnimation(100));
-        }else{
-
+        } else {
+          //Random asset
         }
 
         actor.pos = vec(
           engine.halfDrawWidth - 270 + posCount,
           engine.halfDrawHeight + 85
         );
+      } else {
+        const assets = [Monsters.demon, Monsters.beast, Monsters.ghost];
+        const monsterAsset = assets[getRandomInt(0, assets.length - 1)];
+        const graphic = monsterAsset;
+
+        graphic.width = 300;
+        graphic.height = 300;
+        actor.scale = new Vector(
+          monsterAsset === Monsters.demon ? 1 : 2,
+          monsterAsset === Monsters.demon ? 1 : 2
+        );
+        actor.graphics.use(graphic.toAnimation(120));
+        actor.pos = vec(
+          engine.halfDrawWidth + 300 - monsterPosCount,
+          monsterAsset === Monsters.ghost || monsterAsset === Monsters.demon
+            ? engine.halfDrawHeight
+            : engine.halfDrawHeight - 10
+        );
+        monsterPosCount += 100;
       }
       posCount += 100;
+
       const healthBar = new HealthBar(
         100,
         character.health,
-        new Vector(actor.pos.x, actor.pos.y - getRandomInt(45, 80))
+        new Vector(actor.pos.x, actor.pos.y - getRandomInt(45, 60))
       );
       this.add(healthBar);
       if (character instanceof Monster) {
@@ -340,7 +361,7 @@ export class GameScene extends Scene {
             textAlign: TextAlign.Center,
           }),
           text: `Causó: ${damage} de daño a ${monsterCharacter.name}`,
-          pos: vec(currentHero.pos.x, currentHero.pos.y - 10),
+          pos: vec(currentHero.pos.x, currentHero.pos.y - getRandomInt(0, 50)),
           color: Color.White,
         });
 
@@ -414,6 +435,7 @@ export class GameScene extends Scene {
     console.log("-----Monster turn-----");
 
     // Utiliza un bucle for en lugar de map para poder salir del bucle si es necesario
+    let posY = 0;
     for (let index = 0; index < this.monsterCharacters.length; index++) {
       const currentMonsterCharacter = this.monsterCharacters[index];
       const currentMonster = this.monsters[index];
@@ -449,7 +471,7 @@ export class GameScene extends Scene {
             textAlign: TextAlign.Center,
           }),
           text: `Causó: ${damage} de daño a ${heroCharacter.name}`,
-          pos: vec(currentMonster.pos.x, currentMonster.pos.y - 10),
+          pos: vec(currentMonster.pos.x, currentMonster.pos.y - posY),
           color: Color.White,
         });
 
@@ -459,6 +481,7 @@ export class GameScene extends Scene {
           labelmessage.kill();
         }, 3000);
       }
+      posY += 50;
 
       if (heroCharacter.health < 1) {
         console.log(`${heroCharacter.name} has been defeated.`);

@@ -12,9 +12,15 @@ const Images = {
 };
 
 const Warriors = {
-  warrior: new ex.Gif("/assets/images/warrior-idle.gif",ex.Color.Transparent),
+  warrior: new ex.Gif("/assets/images/warrior-idle.gif", ex.Color.Transparent),
   // warriorAttack: new ex.ImageSource("/assets/images/warriorAttack.png"),
   // warriorDead: new ex.ImageSource("/assets/images/warriorDead.png"),
+};
+
+const Monsters = {
+  beast: new ex.Gif("/assets/images/beast-idle.gif", ex.Color.Transparent),
+  demon: new ex.Gif("/assets/images/demon-idle.gif", ex.Color.Transparent),
+  ghost: new ex.Gif("/assets/images/ghost-idle.gif", ex.Color.Transparent),
 };
 
 const Sounds = {
@@ -23,10 +29,10 @@ const Sounds = {
 };
 
 const loader = new ex.Loader();
-const allResources = { ...Images, ...Sounds, ...Warriors };
+const allResources = { ...Images, ...Sounds, ...Warriors, ...Monsters };
 for (const res in allResources) {
   // @ts-ignore
   loader.addResource(allResources[res]);
 }
 
-export { loader, Images, Sounds, Warriors };
+export { loader, Images, Sounds, Warriors, Monsters };
