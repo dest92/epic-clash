@@ -24,7 +24,7 @@ export class MainMenuScene extends Scene {
   onActivate(_context: SceneActivationContext<unknown>): void {
     if (gameOverSound.isLoaded()) {
       gameOverSound.stop();
-    } 
+    }
   }
   onInitialize(engine: Engine) {
     // const spriteSheetImage = new ImageSource("../assets/images/background.png");
@@ -94,7 +94,6 @@ export class MainMenuScene extends Scene {
       }),
     });
 
-
     this.add(loading);
 
     setTimeout(() => {
@@ -102,6 +101,6 @@ export class MainMenuScene extends Scene {
       this.add(background);
       this.add(playButton);
       this.add(howToPlayButton);
-    }, 5000);
+    }, 6000);
   }
 }

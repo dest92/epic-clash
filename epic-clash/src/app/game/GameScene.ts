@@ -326,6 +326,11 @@ export class GameScene extends Scene {
           actor.graphics.add("idle", graphic.toAnimation(100));
           actor.graphics.add("attack", attackGraphic.toAnimation(120));
           actor.graphics.use(graphic.toAnimation(120));
+          const setPosY = warriorAsset === Warriors.archer ? 40 : 0;
+          actor.pos = vec(
+            engine.halfDrawWidth - 270 + posCount,
+            engine.halfDrawHeight + 85 - setPosY
+          );
         } else {
           const assets = [Mages.mage, Mages.mage2, Mages.mage3];
           const attackAssets = [
@@ -348,18 +353,28 @@ export class GameScene extends Scene {
           actor.graphics.add("idle", graphic.toAnimation(100));
           actor.graphics.add("attack", attackGraphic.toAnimation(120));
           actor.graphics.use(graphic.toAnimation(120));
+          const setPosY = mageAsset === Mages.mage ? 25 : 0;
+          actor.pos = vec(
+            engine.halfDrawWidth - 270 + posCount,
+            engine.halfDrawHeight + 85 - setPosY
+          );
         }
-
-        actor.pos = vec(
-          engine.halfDrawWidth - 270 + posCount,
-          engine.halfDrawHeight + 85
-        );
       } else {
-        const assets = [Monsters.demon, Monsters.beast, Monsters.ghost];
+        const assets = [
+          Monsters.demon,
+          Monsters.beast,
+          Monsters.ghost,
+          Monsters.badKnight,
+          Monsters.skeleton,
+          Monsters.skeleton2,
+        ];
         const attackAssets = [
           Monsters.demonAttack,
           Monsters.beastAttack,
           Monsters.ghostAttack,
+          Monsters.badKnightAttack,
+          Monsters.skeletonAttack,
+          Monsters.skeleton2Attack,
         ];
 
         const randomIndex = getRandomInt(0, assets.length - 1);
@@ -378,11 +393,17 @@ export class GameScene extends Scene {
         actor.graphics.add("idle", graphic.toAnimation(100));
         actor.graphics.use(graphic.toAnimation(120));
         actor.graphics.add("attack", attackGraphic.toAnimation(120));
+        const setPosY =
+          monsterAsset === Monsters.skeleton ||
+          Monsters.skeleton2 ||
+          Monsters.badKnight
+            ? 40
+            : 10;
         actor.pos = vec(
           engine.halfDrawWidth + 300 - monsterPosCount,
           monsterAsset === Monsters.ghost || monsterAsset === Monsters.demon
             ? engine.halfDrawHeight
-            : engine.halfDrawHeight - 10
+            : engine.halfDrawHeight + setPosY
         );
         monsterPosCount += 100;
       }

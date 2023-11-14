@@ -9,7 +9,7 @@ export const initializeGame = (canvasElement: HTMLCanvasElement) => {
     canvasElement: canvasElement,
     width: 800,
     height: 400,
-    backgroundColor: Color.Azure,
+    backgroundColor: Color.Black,
     suppressPlayButton: true,
     suppressConsoleBootMessage: true,
     antialiasing: false,

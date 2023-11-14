@@ -1,10 +1,4 @@
-import {
-  Scene,
-  Engine,
-  Color,
-  vec,
-  Actor,
-} from "excalibur";
+import { Scene, Engine, Color, vec, Actor } from "excalibur";
 import { Images } from "./resources";
 
 export class HowToPlayScene extends Scene {
@@ -16,7 +10,6 @@ export class HowToPlayScene extends Scene {
     });
 
     background.graphics.use(Images.howToPlay.toSprite());
-
 
     // Crear un label para el mensaje de Game Over
 

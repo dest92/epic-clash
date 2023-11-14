@@ -76,6 +76,21 @@ const Monsters = {
     "/assets/images/ghost-attack.gif",
     ex.Color.Transparent
   ),
+  skeleton: new ex.Gif("/assets/images/skeleton-idle.gif", ex.Color.Black),
+  skeletonAttack: new ex.Gif(
+    "/assets/images/skeleton-attack.gif",
+    ex.Color.Black
+  ),
+  skeleton2: new ex.Gif("/assets/images/skeleton2-idle.gif", ex.Color.Black),
+  skeleton2Attack: new ex.Gif(
+    "/assets/images/skeleton2-attack.gif",
+    ex.Color.Black
+  ),
+  badKnight: new ex.Gif("/assets/images/badKnight-idle.gif", ex.Color.Black),
+  badKnightAttack: new ex.Gif(
+    "/assets/images/badKnight-attack.gif",
+    ex.Color.Black
+  ),
 };
 
 const loader = new ex.Loader();
