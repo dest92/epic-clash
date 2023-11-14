@@ -14,7 +14,7 @@ import {
   BaseAlign,
 } from "excalibur";
 import { Warrior, Mage, Monster, Weapon, ICharacter } from "./characters";
-import { Images, Warriors, loader, Monsters } from "./resources";
+import { Images, Warriors, loader, Monsters, Mages } from "./resources";
 import HealthBar from "./HealthBar";
 
 import {
@@ -48,14 +48,47 @@ export class GameScene extends Scene {
     let isMage;
     if (newHero instanceof Mage) {
       isMage = true;
+      const assets = [Mages.mage, Mages.mage2, Mages.mage3];
+      const attackAssets = [
+        Mages.mageAttack,
+        Mages.mage2Attack,
+        Mages.mage3Attack,
+      ];
+      const randomIndex = getRandomInt(0, assets.length - 1);
+
+      const mageAsset = assets[randomIndex];
+      const attackGraphic = attackAssets[randomIndex];
+
+      const graphic = mageAsset;
+      graphic.width = 300;
+      graphic.height = 300;
+      currentActor.scale = new Vector(
+        mageAsset === Mages.mage2 ? 1 : 2,
+        mageAsset === Mages.mage2 ? 1 : 2
+      );
+      currentActor.graphics.use(graphic.toAnimation(100));
+      currentActor.graphics.add("idle", graphic.toAnimation(100));
+      currentActor.graphics.add("attack", attackGraphic.toAnimation(120));
     } else {
       isMage = false;
-      const graphic = Warriors.warrior;
+      const assets = [Warriors.warrior, Warriors.warrior2, Warriors.knight];
+      const attackAssets = [
+        Warriors.warriorAttack,
+        Warriors.warrior2Attack,
+        Warriors.knightAttack,
+      ];
+      const randomIndex = getRandomInt(0, assets.length - 1);
+
+      const warriorAsset = assets[randomIndex];
+      const attackGraphic = attackAssets[randomIndex];
+
+      const graphic = warriorAsset;
       graphic.width = 300;
       graphic.height = 300;
       currentActor.scale = new Vector(2, 2);
-      currentActor.graphics.use(graphic.toAnimation(100));
-      currentActor.graphics.add("warrior", graphic.toAnimation(100));
+      currentActor.graphics.add("idle", graphic.toAnimation(100));
+      currentActor.graphics.add("attack", attackGraphic.toAnimation(120));
+      currentActor.graphics.use(graphic.toAnimation(120));
     }
     newHero.name = getRandomName(isMage ? "wizard" : "warrior");
     newHero.health = currentHero.health;
@@ -111,9 +144,22 @@ export class GameScene extends Scene {
     // También puedes resaltar el héroe seleccionado para que el jugador sepa cuál está controlando
     this.heroes.forEach((hero, index) => {
       if (index === this.currentHeroIndex) {
-        hero.color = Color.Yellow; // Color de resaltado para el héroe seleccionado
-      } else {
-        hero.color = Color.Red; // Color normal para los otros héroes
+        const selecetHero = new Label({
+          text: "Selected Hero",
+          color: Color.Yellow,
+          pos: vec(hero.pos.x, hero.pos.y + 50),
+          font: new Font({
+            family: "PressStart2P",
+            size: 10,
+            unit: FontUnit.Px,
+            textAlign: TextAlign.Center,
+          }),
+        });
+        this.add(selecetHero);
+
+        setTimeout(() => {
+          selecetHero.kill();
+        }, 1500);
       }
     });
   }
@@ -243,14 +289,46 @@ export class GameScene extends Scene {
 
       if (character instanceof Warrior || character instanceof Mage) {
         if (character instanceof Warrior) {
-          const graphic = Warriors.warrior;
+          const assets = [Warriors.warrior, Warriors.warrior2, Warriors.knight];
+          const attackAssets = [
+            Warriors.warriorAttack,
+            Warriors.warrior2Attack,
+            Warriors.knightAttack,
+          ];
+          const randomIndex = getRandomInt(0, assets.length - 1);
+
+          const warriorAsset = assets[randomIndex];
+          const attackGraphic = attackAssets[randomIndex];
+
+          const graphic = warriorAsset;
           graphic.width = 300;
           graphic.height = 300;
           actor.scale = new Vector(2, 2);
-          actor.graphics.use(graphic.toAnimation(100));
-          actor.graphics.add("warrior", graphic.toAnimation(100));
+          actor.graphics.add("idle", graphic.toAnimation(100));
+          actor.graphics.add("attack", attackGraphic.toAnimation(120));
+          actor.graphics.use(graphic.toAnimation(120));
         } else {
-          //Random asset
+          const assets = [Mages.mage, Mages.mage2, Mages.mage3];
+          const attackAssets = [
+            Mages.mageAttack,
+            Mages.mage2Attack,
+            Mages.mage3Attack,
+          ];
+          const randomIndex = getRandomInt(0, assets.length - 1);
+
+          const mageAsset = assets[randomIndex];
+          const attackGraphic = attackAssets[randomIndex];
+
+          const graphic = mageAsset;
+          graphic.width = 300;
+          graphic.height = 300;
+          actor.scale = new Vector(
+            mageAsset === Mages.mage2 ? 1 : 2,
+            mageAsset === Mages.mage2 ? 1.5 : 2
+          );
+          actor.graphics.add("idle", graphic.toAnimation(100));
+          actor.graphics.add("attack", attackGraphic.toAnimation(120));
+          actor.graphics.use(graphic.toAnimation(120));
         }
 
         actor.pos = vec(
@@ -373,6 +451,10 @@ export class GameScene extends Scene {
       if (!monsterActor || !monsterCharacter) continue;
 
       const damage = currentHeroCharacter.attack(monsterCharacter);
+      currentHero.graphics.use("attack");
+      setTimeout(() => {
+        currentHero.graphics.use("idle");
+      }, 2000);
 
       if (this.monsterCharacters[randomIndex]) {
         const labelmessage = new Label({
@@ -415,7 +497,7 @@ export class GameScene extends Scene {
         if (monsterCharacter.hasWeapon()) {
           const droppedWeapon = monsterCharacter.weapon;
           let heroToEquipWeapon = this.findHeroToEquipWeapon();
-          if (heroToEquipWeapon !== undefined && droppedWeapon !== undefined) {
+          if (droppedWeapon !== undefined) {
             heroToEquipWeapon.pickWeapon(droppedWeapon);
             const weaponPicked = new Label({
               font: new Font({
@@ -434,7 +516,7 @@ export class GameScene extends Scene {
             this.add(weaponPicked);
             setTimeout(() => {
               weaponPicked.kill();
-            }, 3000);
+            }, 4000);
           }
         }
         this.remove(monsterActor);
