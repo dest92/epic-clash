@@ -58,8 +58,9 @@ export abstract class Hero implements IHero {
 
 // Clase Warrior
 export class Warrior extends Hero {
-  pickWeapon(weapon: Weapon): void { 
+  pickWeapon(weapon: Weapon): void {
     this.weapon = weapon;
+    this.weapon.damage = weapon.damage;
   }
   attack(target: ICharacter): number {
     const damage = this.hasWeapon() ? this.weapon!.damage * 3 : 0;
@@ -114,7 +115,7 @@ export class Monster implements IMonster {
     return this.weapon.damage > 1;
   }
 
-  pickWeapon(weapon: Weapon): void { 
+  pickWeapon(weapon: Weapon): void {
     this.weapon.damage = weapon.damage;
   }
 }
