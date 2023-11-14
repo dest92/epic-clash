@@ -206,7 +206,7 @@ export class GameScene extends Scene {
     background.graphics.use(Images.inGame.toSprite());
 
     this.add(background);
-    const characters = createCharacters(2, 3);
+    const characters = createCharacters(getRandomInt(1, 3), getRandomInt(1, 3));
     const attackButton = new Actor({
       pos: vec(engine.halfDrawWidth + 330, engine.halfDrawHeight + 170),
       width: 130,
@@ -393,18 +393,20 @@ export class GameScene extends Scene {
         actor.graphics.add("idle", graphic.toAnimation(100));
         actor.graphics.use(graphic.toAnimation(120));
         actor.graphics.add("attack", attackGraphic.toAnimation(120));
-        const setPosY =
+        let setPosY =
           monsterAsset === Monsters.skeleton ||
           Monsters.skeleton2 ||
           Monsters.badKnight
             ? 40
-            : 10;
+            : 0;
+        if (monsterAsset === Monsters.beast) setPosY = -15;
         actor.pos = vec(
           engine.halfDrawWidth + 300 - monsterPosCount,
           monsterAsset === Monsters.ghost || monsterAsset === Monsters.demon
             ? engine.halfDrawHeight
             : engine.halfDrawHeight + setPosY
         );
+        if (monsterAsset === Monsters.beast) console.log(actor.pos);
         monsterPosCount += 100;
       }
       posCount += 100;
