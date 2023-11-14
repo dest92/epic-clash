@@ -24,7 +24,7 @@ export class MainMenuScene extends Scene {
   onActivate(_context: SceneActivationContext<unknown>): void {
     if (gameOverSound.isLoaded()) {
       gameOverSound.stop();
-    }
+    } 
   }
   onInitialize(engine: Engine) {
     // const spriteSheetImage = new ImageSource("../assets/images/background.png");

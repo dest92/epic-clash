@@ -23,7 +23,12 @@ import {
   getRandomName,
   hasWeapon,
 } from "./actors";
+import { backgroundSounds } from "./MainMenu";
 export class GameScene extends Scene {
+  onDeactivate(_context: SceneActivationContext<undefined>): void {
+    backgroundSounds.stop();
+  }
+
   private heroes: Actor[] = [];
   private heroCharacters: ICharacter[] = [];
   private currentHeroIndex: number = 0; // Índice del héroe actualmente seleccionado
@@ -186,7 +191,9 @@ export class GameScene extends Scene {
   };
 
   onActivate(_context: SceneActivationContext<unknown>): void {
-    console.log("GameScene activated");
+    if (backgroundSounds.isLoaded() || !backgroundSounds.isPlaying()) {
+      backgroundSounds.play();
+    }
   }
 
   onInitialize(engine: Engine) {

@@ -18,7 +18,12 @@ import { backgroundSounds } from "./MainMenu";
 export const gameOverSound = new Sound("../assets/sounds/dead.wav");
 
 export class GameOverScene extends Scene {
-  onActivate(_context: SceneActivationContext<unknown>): void {}
+  onDeactivate(_context: SceneActivationContext<undefined>): void {
+    gameOverSound.stop();
+  }
+  onActivate(_context: SceneActivationContext<unknown>): void {
+    backgroundSounds.stop();
+  }
   onInitialize(engine: Engine) {
     backgroundSounds.stop();
     const background = new Actor({
