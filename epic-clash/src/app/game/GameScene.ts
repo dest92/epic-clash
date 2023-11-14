@@ -533,13 +533,17 @@ export class GameScene extends Scene {
 
       monsterHealthBar.updateHealth(monsterCharacter.health);
 
-      if (monsterCharacter.health <= 0) {
+      if (monsterCharacter.health < 1) {
         monsterActor.kill();
         monsterHealthBar.kill();
         if (monsterCharacter.hasWeapon()) {
           const droppedWeapon = monsterCharacter.weapon;
           let heroToEquipWeapon = this.findHeroToEquipWeapon();
-          if (droppedWeapon !== undefined) {
+          let damage = heroToEquipWeapon.weapon?.damage ?? 0;
+          if (
+            droppedWeapon !== undefined &&
+            heroToEquipWeapon instanceof Warrior && (damage < droppedWeapon.damage)
+          ) {
             heroToEquipWeapon.pickWeapon(droppedWeapon);
             const weaponPicked = new Label({
               font: new Font({
@@ -549,16 +553,16 @@ export class GameScene extends Scene {
                 textAlign: TextAlign.Center,
               }),
               text: `Weapon with ${droppedWeapon?.damage} damage picked up by ${heroToEquipWeapon.name}`,
-              pos: vec(
-                this.engine.halfDrawWidth,
-                this.engine.halfDrawWidth + 220
-              ),
+              pos: vec(this.engine.halfDrawWidth, this.engine.halfDrawHeight),
               color: Color.White,
             });
+            console.log(droppedWeapon);
+            console.log(heroToEquipWeapon.weapon);
             this.add(weaponPicked);
             setTimeout(() => {
               weaponPicked.kill();
             }, 4000);
+            heroToEquipWeapon.weapon = droppedWeapon;
           }
         }
         this.remove(monsterActor);
@@ -607,7 +611,11 @@ export class GameScene extends Scene {
           );
 
           // Si hay otros héroes, selecciona uno al azar para recibir el arma
-          if (heroesExceptCurrent.length > 0 && weapon !== undefined) {
+          if (
+            heroesExceptCurrent.length > 0 &&
+            weapon !== undefined &&
+            weapon.damage > 0
+          ) {
             let randomHeroIndex = Math.floor(
               Math.random() * heroesExceptCurrent.length
             );
@@ -638,6 +646,13 @@ export class GameScene extends Scene {
     return (
       this.heroCharacters.find((hero) => !hero.hasWeapon()) ||
       this.heroCharacters[0]
+    );
+  }
+
+  findMonsterToEquipWeapon() {
+    return (
+      this.monsterCharacters.find((monster) => !monster.hasWeapon()) ||
+      this.monsterCharacters[0]
     );
   }
   performMonsterAttack() {
@@ -703,55 +718,37 @@ export class GameScene extends Scene {
       if (heroCharacter.health < 1) {
         heroActor.kill();
         heroHealthBar.kill();
-        this.remove(heroActor);
-        this.remove(heroHealthBar);
-        this.heroes.splice(randomIndex, 1);
-        this.heroCharacters.splice(randomIndex, 1);
-        this.heroHealthBars.splice(randomIndex, 1);
-
         if (
-          currentMonsterCharacter instanceof Monster &&
-          !currentMonsterCharacter.hasDroppedWeapon &&
-          currentMonsterCharacter.hasWeapon()
+          heroCharacter instanceof Warrior &&
+          !heroCharacter.hasDroppedWeapon &&
+          heroCharacter.hasWeapon()
         ) {
-          console.log(
-            ` ****${currentMonsterCharacter.name} dropped a weapon...`
-          );
-          const weapon = currentMonsterCharacter.dropWeapon();
-
-          // Get an array of all monsters except the one that dropped the weapon
-          const monstersExceptCurrent = this.monsterCharacters.filter(
-            (monster) => monster !== currentMonsterCharacter
-          );
-          const heroWarriors = this.heroCharacters.filter(
-            (character) => character instanceof Warrior
-          );
-          const poolDrop = monstersExceptCurrent.concat(heroWarriors);
-          // If there are characters left, select a random one to receive the weapon
-          if (poolDrop.length > 0 && weapon !== undefined) {
-            let randomDropIndex = Math.floor(Math.random() * poolDrop.length);
-            let characterToReceiveWeapon = poolDrop[randomDropIndex];
-            characterToReceiveWeapon.pickWeapon(weapon);
-            const labelWeapons = new Label({
+          const droppedWeapon = heroCharacter.dropWeapon();
+          let monsterToEquipWeapon = this.findMonsterToEquipWeapon();
+          if (droppedWeapon !== undefined) {
+            monsterToEquipWeapon.pickWeapon(droppedWeapon);
+            const weaponPicked = new Label({
               font: new Font({
                 family: "PressStart2P",
                 size: 10,
                 unit: FontUnit.Px,
                 textAlign: TextAlign.Center,
               }),
-              text: `Weapon with ${weapon?.damage} damage dropped and given to ${characterToReceiveWeapon.name}`,
-              pos: vec(
-                this.engine.halfDrawWidth,
-                this.engine.halfDrawWidth + 200
-              ),
+              text: `Weapon with ${droppedWeapon?.damage} damage picked up by ${monsterToEquipWeapon.name}`,
+              pos: vec(this.engine.halfDrawWidth, this.engine.halfDrawHeight),
               color: Color.White,
             });
-            this.add(labelWeapons);
+            this.add(weaponPicked);
             setTimeout(() => {
-              labelWeapons.kill();
-            }, 3000);
+              weaponPicked.kill();
+            }, 4000);
           }
         }
+        this.remove(heroActor);
+        this.remove(heroHealthBar);
+        this.heroes.splice(randomIndex, 1);
+        this.heroCharacters.splice(randomIndex, 1);
+        this.heroHealthBars.splice(randomIndex, 1);
 
         // Si se eliminó un héroe, ajusta el índice si es necesario
         index = index > 0 ? index - 1 : 0;
@@ -766,81 +763,4 @@ export class GameScene extends Scene {
 
     this.changeTurn();
   }
-
-  // showWeapon() {
-  //   this.heroCharacters.map((currentHero, index) => {
-  //     const heroActor = this.heroes[index];
-
-  //     if (currentHero.hasWeapon()) {
-  //       const label = new Label({
-  //         text: `${currentHero.name} Has Weapon`,
-  //         color: Color.White,
-  //         pos: vec(heroActor.pos.x, this.engine.halfDrawHeight - 50),
-  //         font: new Font({
-  //           family: "PressStart2P",
-  //           size: 10,
-  //           unit: FontUnit.Px,
-  //           textAlign: TextAlign.Center,
-  //         }),
-  //       });
-  //       this.add(label);
-  //       setTimeout(() => {
-  //         label.kill();
-  //       }, 3000);
-  //     } else {
-  //       const label = new Label({
-  //         text: `${currentHero.name}`,
-  //         color: Color.White,
-  //         pos: vec(heroActor.pos.x, heroActor.pos.y + 50),
-  //         font: new Font({
-  //           family: "PressStart2P",
-  //           size: 10,
-  //           unit: FontUnit.Px,
-  //           textAlign: TextAlign.Center,
-  //         }),
-  //       });
-  //       setTimeout(() => {
-  //         label.kill();
-  //       }, 3000);
-  //     }
-  //   });
-
-  //   this.monsterCharacters.map((currentMonster, index) => {
-  //     const monsterActor = this.monsters[index];
-  //     if (currentMonster.hasWeapon()) {
-  //       const label = new Label({
-  //         text: `${currentMonster.name.replace("| Monster", "")} Has Weapon`,
-  //         color: Color.White,
-  //         pos: vec(monsterActor.pos.x, monsterActor.pos.y + 50),
-  //         font: new Font({
-  //           family: "PressStart2P",
-  //           size: 10,
-  //           unit: FontUnit.Px,
-  //           textAlign: TextAlign.Center,
-  //         }),
-  //       });
-  //       this.add(label);
-  //       setTimeout(() => {
-  //         label.kill();
-  //       }, 3000);
-  //     } else {
-  //       const label = new Label({
-  //         text: `${currentMonster.name.replace("| Monster", "")}`,
-  //         color: Color.White,
-  //         pos: vec(monsterActor.pos.x, monsterActor.pos.y - 50),
-  //         font: new Font({
-  //           family: "PressStart2P",
-  //           size: 10,
-  //           unit: FontUnit.Px,
-  //           textAlign: TextAlign.Center,
-  //         }),
-  //       });
-  //       this.add(label);
-
-  //       setTimeout(() => {
-  //         label.kill();
-  //       }, 3000);
-  //     }
-  //   });
-  // }
 }
