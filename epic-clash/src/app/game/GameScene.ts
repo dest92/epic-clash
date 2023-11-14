@@ -71,11 +71,17 @@ export class GameScene extends Scene {
       currentActor.graphics.add("attack", attackGraphic.toAnimation(120));
     } else {
       isMage = false;
-      const assets = [Warriors.warrior, Warriors.warrior2, Warriors.knight];
+      const assets = [
+        Warriors.warrior,
+        Warriors.warrior2,
+        Warriors.knight,
+        Warriors.archer,
+      ];
       const attackAssets = [
         Warriors.warriorAttack,
         Warriors.warrior2Attack,
         Warriors.knightAttack,
+        Warriors.archerAttack,
       ];
       const randomIndex = getRandomInt(0, assets.length - 1);
 
@@ -289,11 +295,17 @@ export class GameScene extends Scene {
 
       if (character instanceof Warrior || character instanceof Mage) {
         if (character instanceof Warrior) {
-          const assets = [Warriors.warrior, Warriors.warrior2, Warriors.knight];
+          const assets = [
+            Warriors.warrior,
+            Warriors.warrior2,
+            Warriors.knight,
+            Warriors.archer,
+          ];
           const attackAssets = [
             Warriors.warriorAttack,
             Warriors.warrior2Attack,
             Warriors.knightAttack,
+            Warriors.archerAttack,
           ];
           const randomIndex = getRandomInt(0, assets.length - 1);
 

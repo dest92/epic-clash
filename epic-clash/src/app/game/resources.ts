@@ -32,8 +32,8 @@ const Warriors = {
     ex.Color.Black,
     true
   ),
-  // warriorAttack: new ex.ImageSource("/assets/images/warriorAttack.png"),
-  // warriorDead: new ex.ImageSource("/assets/images/warriorDead.png"),
+  archer: new ex.Gif("/assets/images/archer.gif", ex.Color.Black),
+  archerAttack: new ex.Gif("/assets/images/archer-attack.gif", ex.Color.Black),
 };
 
 const Mages = {
