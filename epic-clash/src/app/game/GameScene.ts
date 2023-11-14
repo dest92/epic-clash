@@ -11,12 +11,18 @@ import {
   Label,
   SceneActivationContext,
   Vector,
+  BaseAlign,
 } from "excalibur";
 import { Warrior, Mage, Monster, Weapon, ICharacter } from "./characters";
-import { Images, loader } from "./resources";
+import { Images, Warriors, loader, Monsters, Mages } from "./resources";
 import HealthBar from "./HealthBar";
 
-import { createCharacters, getRandomName } from "./actors";
+import {
+  createCharacters,
+  getRandomInt,
+  getRandomName,
+  hasWeapon,
+} from "./actors";
 export class GameScene extends Scene {
   private heroes: Actor[] = [];
   private heroCharacters: ICharacter[] = [];
@@ -32,6 +38,7 @@ export class GameScene extends Scene {
   private changeHeroType() {
     // Obtén el héroe actual y su barra de salud
     let currentHero = this.heroCharacters[this.currentHeroIndex];
+    let currentActor = this.heroes[this.currentHeroIndex];
     console.log(`currentHero: ${currentHero.name}`);
     // Determina el nuevo tipo de héroe
     let newHeroType = currentHero instanceof Warrior ? Mage : Warrior;
@@ -41,16 +48,65 @@ export class GameScene extends Scene {
     let isMage;
     if (newHero instanceof Mage) {
       isMage = true;
+      const assets = [Mages.mage, Mages.mage2, Mages.mage3];
+      const attackAssets = [
+        Mages.mageAttack,
+        Mages.mage2Attack,
+        Mages.mage3Attack,
+      ];
+      const randomIndex = getRandomInt(0, assets.length - 1);
+
+      const mageAsset = assets[randomIndex];
+      const attackGraphic = attackAssets[randomIndex];
+
+      const graphic = mageAsset;
+      graphic.width = 300;
+      graphic.height = 300;
+      currentActor.scale = new Vector(
+        mageAsset === Mages.mage2 ? 1 : 2,
+        mageAsset === Mages.mage2 ? 1 : 2
+      );
+      currentActor.graphics.use(graphic.toAnimation(100));
+      currentActor.graphics.add("idle", graphic.toAnimation(100));
+      currentActor.graphics.add("attack", attackGraphic.toAnimation(120));
     } else {
       isMage = false;
+      const assets = [
+        Warriors.warrior,
+        Warriors.warrior2,
+        Warriors.knight,
+        Warriors.archer,
+      ];
+      const attackAssets = [
+        Warriors.warriorAttack,
+        Warriors.warrior2Attack,
+        Warriors.knightAttack,
+        Warriors.archerAttack,
+      ];
+      const randomIndex = getRandomInt(0, assets.length - 1);
+
+      const warriorAsset = assets[randomIndex];
+      const attackGraphic = attackAssets[randomIndex];
+
+      const graphic = warriorAsset;
+      graphic.width = 300;
+      graphic.height = 300;
+      currentActor.scale = new Vector(2, 2);
+      currentActor.graphics.add("idle", graphic.toAnimation(100));
+      currentActor.graphics.add("attack", attackGraphic.toAnimation(120));
+      currentActor.graphics.use(graphic.toAnimation(120));
     }
     newHero.name = getRandomName(isMage ? "wizard" : "warrior");
     newHero.health = currentHero.health;
-    newHero.weapon = currentHero.weapon; // Asegúrate de que el mago no reciba un arma
+
     console.log(`newHero: ${newHero.name}`);
     // Si el nuevo héroe es un mago, asegúrate de que no tenga un arma
     if (newHero instanceof Mage) {
       newHero.weapon = undefined;
+    } else {
+      newHero.weapon = hasWeapon()
+        ? new Weapon(getRandomInt(1, 10))
+        : undefined;
     }
 
     // Actualiza la referencia en el arreglo de héroes
@@ -94,9 +150,22 @@ export class GameScene extends Scene {
     // También puedes resaltar el héroe seleccionado para que el jugador sepa cuál está controlando
     this.heroes.forEach((hero, index) => {
       if (index === this.currentHeroIndex) {
-        hero.color = Color.Yellow; // Color de resaltado para el héroe seleccionado
-      } else {
-        hero.color = Color.Red; // Color normal para los otros héroes
+        const selecetHero = new Label({
+          text: "Selected Hero",
+          color: Color.Yellow,
+          pos: vec(hero.pos.x, hero.pos.y + 50),
+          font: new Font({
+            family: "PressStart2P",
+            size: 10,
+            unit: FontUnit.Px,
+            textAlign: TextAlign.Center,
+          }),
+        });
+        this.add(selecetHero);
+
+        setTimeout(() => {
+          selecetHero.kill();
+        }, 1500);
       }
     });
   }
@@ -129,9 +198,8 @@ export class GameScene extends Scene {
 
     background.graphics.use(Images.inGame.toSprite());
 
-    engine.start(loader);
     this.add(background);
-    const characters = createCharacters(3, 3);
+    const characters = createCharacters(2, 3);
     const attackButton = new Actor({
       pos: vec(engine.halfDrawWidth + 330, engine.halfDrawHeight + 170),
       width: 130,
@@ -149,6 +217,13 @@ export class GameScene extends Scene {
 
     attackButton.on("pointerup", () => {
       this.performHeroAttack();
+      attackButton.kill();
+      labelAttack.kill();
+      setTimeout(() => {
+        this.add(attackButton);
+        attackButton.color = Color.Red;
+        this.add(labelAttack);
+      }, 3200);
     });
 
     const labelAttack = new Label({
@@ -164,7 +239,7 @@ export class GameScene extends Scene {
     });
 
     const changeHeroButton = new Actor({
-      pos: vec(engine.halfDrawWidth + 300, engine.halfDrawHeight + 120),
+      pos: vec(engine.halfDrawWidth + 150, engine.halfDrawHeight + 170),
       width: 180,
       height: 30,
       color: Color.Green,
@@ -200,9 +275,12 @@ export class GameScene extends Scene {
         textAlign: TextAlign.Center,
       }),
       text: "Change Hero",
-      pos: vec(engine.halfDrawWidth + 300, engine.halfDrawHeight + 130),
+      pos: vec(engine.halfDrawWidth + 150, engine.halfDrawHeight + 175),
       color: Color.Black,
     });
+
+    let posCount = 0;
+    let monsterPosCount = 0;
 
     characters.forEach((character) => {
       const actor = new Actor({
@@ -215,10 +293,98 @@ export class GameScene extends Scene {
         height: 50,
       });
 
+      if (character instanceof Warrior || character instanceof Mage) {
+        if (character instanceof Warrior) {
+          const assets = [
+            Warriors.warrior,
+            Warriors.warrior2,
+            Warriors.knight,
+            Warriors.archer,
+          ];
+          const attackAssets = [
+            Warriors.warriorAttack,
+            Warriors.warrior2Attack,
+            Warriors.knightAttack,
+            Warriors.archerAttack,
+          ];
+          const randomIndex = getRandomInt(0, assets.length - 1);
+
+          const warriorAsset = assets[randomIndex];
+          const attackGraphic = attackAssets[randomIndex];
+
+          const graphic = warriorAsset;
+          graphic.width = 300;
+          graphic.height = 300;
+          actor.scale = new Vector(2, 2);
+          actor.graphics.add("idle", graphic.toAnimation(100));
+          actor.graphics.add("attack", attackGraphic.toAnimation(120));
+          actor.graphics.use(graphic.toAnimation(120));
+        } else {
+          const assets = [Mages.mage, Mages.mage2, Mages.mage3];
+          const attackAssets = [
+            Mages.mageAttack,
+            Mages.mage2Attack,
+            Mages.mage3Attack,
+          ];
+          const randomIndex = getRandomInt(0, assets.length - 1);
+
+          const mageAsset = assets[randomIndex];
+          const attackGraphic = attackAssets[randomIndex];
+
+          const graphic = mageAsset;
+          graphic.width = 300;
+          graphic.height = 300;
+          actor.scale = new Vector(
+            mageAsset === Mages.mage2 ? 1 : 2,
+            mageAsset === Mages.mage2 ? 1.5 : 2
+          );
+          actor.graphics.add("idle", graphic.toAnimation(100));
+          actor.graphics.add("attack", attackGraphic.toAnimation(120));
+          actor.graphics.use(graphic.toAnimation(120));
+        }
+
+        actor.pos = vec(
+          engine.halfDrawWidth - 270 + posCount,
+          engine.halfDrawHeight + 85
+        );
+      } else {
+        const assets = [Monsters.demon, Monsters.beast, Monsters.ghost];
+        const attackAssets = [
+          Monsters.demonAttack,
+          Monsters.beastAttack,
+          Monsters.ghostAttack,
+        ];
+
+        const randomIndex = getRandomInt(0, assets.length - 1);
+
+        // Usa el mismo índice para ambos, porque están en orden correspondiente
+        const monsterAsset = assets[randomIndex];
+        const attackGraphic = attackAssets[randomIndex];
+        const graphic = monsterAsset;
+
+        graphic.width = 300;
+        graphic.height = 300;
+        actor.scale = new Vector(
+          monsterAsset === Monsters.demon ? 1 : 2,
+          monsterAsset === Monsters.demon ? 1 : 2
+        );
+        actor.graphics.add("idle", graphic.toAnimation(100));
+        actor.graphics.use(graphic.toAnimation(120));
+        actor.graphics.add("attack", attackGraphic.toAnimation(120));
+        actor.pos = vec(
+          engine.halfDrawWidth + 300 - monsterPosCount,
+          monsterAsset === Monsters.ghost || monsterAsset === Monsters.demon
+            ? engine.halfDrawHeight
+            : engine.halfDrawHeight - 10
+        );
+        monsterPosCount += 100;
+      }
+      posCount += 100;
+
       const healthBar = new HealthBar(
         100,
         character.health,
-        new Vector(actor.pos.x, actor.pos.y - 50)
+        new Vector(actor.pos.x, actor.pos.y - getRandomInt(45, 60))
       );
       this.add(healthBar);
       if (character instanceof Monster) {
@@ -235,14 +401,6 @@ export class GameScene extends Scene {
       this.currentTurn = true; // Start the heroes' turn
       this.currentActor = this.heroes[0]; // Start with the first hero
     });
-
-    const papiro = new Actor({
-      pos: vec(engine.halfDrawWidth, engine.halfDrawHeight + 150),
-      width: 200,
-      height: 200,
-    });
-    papiro.graphics.use(Images.papiro.toSprite());
-    this.showWeapon();
 
     this.add(attackButton);
     this.add(changeHeroButton);
@@ -277,13 +435,13 @@ export class GameScene extends Scene {
   scheduleMonsterAttack() {
     this.checkGameOver();
     if (this.monsterCharacters.length === 0) return;
+
     setTimeout(() => {
       this.performMonsterAttack();
-    }, 2000); // Espera 1 segundo antes de que el monstruo ataque
+    }, 3000); // Espera 3 segundos antes de que el monstruo ataque
   }
   performHeroAttack() {
-    console.log("-----Heroes turn-----");
-
+    let posY = 0;
     // Utiliza un bucle for en lugar de map para poder salir del bucle si es necesario
     for (let index = 0; index < this.heroes.length; index++) {
       const currentHero = this.heroes[index];
@@ -296,8 +454,6 @@ export class GameScene extends Scene {
         break; // Sal del bucle si no hay monstruos
       }
 
-      console.log(`-> ${currentHeroCharacter.name} is attacking...`);
-
       // Genera un índice aleatorio para seleccionar un monstruo al azar
       const randomIndex = Math.floor(Math.random() * this.monsters.length);
       const monsterActor = this.monsters[randomIndex];
@@ -307,29 +463,113 @@ export class GameScene extends Scene {
       if (!monsterActor || !monsterCharacter) continue;
 
       const damage = currentHeroCharacter.attack(monsterCharacter);
+      currentHero.graphics.use("attack");
+      setTimeout(() => {
+        currentHero.graphics.use("idle");
+      }, 2000);
+
+      if (this.monsterCharacters[randomIndex]) {
+        const labelmessage = new Label({
+          font: new Font({
+            family: "PressStart2P",
+            size: 10,
+            baseAlign: BaseAlign.Middle,
+            padding: 10,
+            unit: FontUnit.Px,
+            textAlign: TextAlign.Center,
+          }),
+          text: `${
+            currentHeroCharacter.name
+          } Causó: ${damage} de daño a ${monsterCharacter.name.replace(
+            "| Monster",
+            " "
+          )}`,
+          pos: vec(
+            this.engine.halfDrawWidth - 150,
+            currentHero.pos.y - 200 + posY
+          ),
+          color: Color.White,
+        });
+        posY += 25;
+
+        this.add(labelmessage);
+
+        setTimeout(() => {
+          labelmessage.kill();
+        }, 3000);
+      }
+
       const monsterHealthBar = this.monsterHealthBars[randomIndex];
 
       monsterHealthBar.updateHealth(monsterCharacter.health);
 
       if (monsterCharacter.health <= 0) {
-        console.log(`${monsterCharacter.name} has been defeated.`);
         monsterActor.kill();
         monsterHealthBar.kill();
+        if (monsterCharacter.hasWeapon()) {
+          const droppedWeapon = monsterCharacter.weapon;
+          let heroToEquipWeapon = this.findHeroToEquipWeapon();
+          if (droppedWeapon !== undefined) {
+            heroToEquipWeapon.pickWeapon(droppedWeapon);
+            const weaponPicked = new Label({
+              font: new Font({
+                family: "PressStart2P",
+                size: 10,
+                unit: FontUnit.Px,
+                textAlign: TextAlign.Center,
+              }),
+              text: `Weapon with ${droppedWeapon?.damage} damage picked up by ${heroToEquipWeapon.name}`,
+              pos: vec(
+                this.engine.halfDrawWidth,
+                this.engine.halfDrawWidth + 220
+              ),
+              color: Color.White,
+            });
+            this.add(weaponPicked);
+            setTimeout(() => {
+              weaponPicked.kill();
+            }, 4000);
+          }
+        }
         this.remove(monsterActor);
         this.remove(monsterHealthBar);
         this.monsters.splice(randomIndex, 1);
         this.monsterCharacters.splice(randomIndex, 1);
         this.monsterHealthBars.splice(randomIndex, 1);
 
-          // Drop Weapon del Warrior que muere.
-          if (currentHeroCharacter instanceof Warrior && !currentHeroCharacter.hasDroppedWeapon && currentHeroCharacter.hasWeapon()) {
-            // console.log(`currentHeroCharacter instanceof Warrior: ${currentHeroCharacter instanceof Warrior}`);
-            // console.log(`currentHeroCharacter.hasDroppedWeapon: ${currentHeroCharacter.hasDroppedWeapon}`);
-            // console.log(`currentHeroCharacter.hasWeapon(): ${currentHeroCharacter.hasWeapon()}`);
+        // Drop Weapon del Warrior que muere.
+        if (
+          currentHeroCharacter instanceof Warrior &&
+          !currentHeroCharacter.hasDroppedWeapon &&
+          currentHeroCharacter.hasWeapon()
+        ) {
+          console.log(
+            ` *********${currentHeroCharacter.name} dropped a weapon...`
+          );
 
-            console.log(` *********${currentHeroCharacter.name} dropped a weapon...`);
-            const weapon = currentHeroCharacter.dropWeapon();
-            console.log(` weapon with ${weapon?.damage} damage dropped...`);
+          const labelWeapons = new Label({
+            font: new Font({
+              family: "PressStart2P",
+              size: 10,
+              unit: FontUnit.Px,
+              textAlign: TextAlign.Center,
+            }),
+            text: `${currentHeroCharacter.name} dropped a weapon...`,
+            pos: vec(
+              this.engine.halfDrawWidth,
+              this.engine.halfDrawWidth + 200
+            ),
+            color: Color.White,
+          });
+
+          this.add(labelWeapons);
+
+          setTimeout(() => {
+            labelWeapons.kill();
+          }, 3000);
+
+          const weapon = currentHeroCharacter.dropWeapon();
+          console.log(` weapon with ${weapon?.damage} damage dropped...`);
 
           // Obtén un array de todos los héroes excepto el que soltó el arma
           const heroesExceptCurrent = this.heroCharacters.filter(
@@ -337,7 +577,7 @@ export class GameScene extends Scene {
           );
 
           // Si hay otros héroes, selecciona uno al azar para recibir el arma
-          if (heroesExceptCurrent.length > 0) {
+          if (heroesExceptCurrent.length > 0 && weapon !== undefined) {
             let randomHeroIndex = Math.floor(
               Math.random() * heroesExceptCurrent.length
             );
@@ -364,86 +604,213 @@ export class GameScene extends Scene {
     this.scheduleMonsterAttack();
   }
 
+  findHeroToEquipWeapon() {
+    return (
+      this.heroCharacters.find((hero) => !hero.hasWeapon()) ||
+      this.heroCharacters[0]
+    );
+  }
   performMonsterAttack() {
     console.log("-----Monster turn-----");
 
-    this.monsterCharacters.map((currentMonsterCharacter) => {
-      if (!currentMonsterCharacter) return;
+    // Utiliza un bucle for en lugar de map para poder salir del bucle si es necesario
+    let posY = 0;
+    for (let index = 0; index < this.monsterCharacters.length; index++) {
+      const currentMonsterCharacter = this.monsterCharacters[index];
+      const currentMonster = this.monsters[index];
 
-      console.log(`->${currentMonsterCharacter.name} is attacking...`);
+      if (!currentMonsterCharacter) continue;
+
+      // Asegúrate de que haya héroes disponibles para atacar
+      if (this.heroes.length === 0) {
+        this.checkGameOver();
+        break; // Sal del bucle si no hay héroes
+      }
 
       // Genera un índice aleatorio para seleccionar un héroe al azar
       const randomIndex = Math.floor(Math.random() * this.heroes.length);
-
       const heroActor = this.heroes[randomIndex];
       const heroCharacter = this.heroCharacters[randomIndex];
 
+      // Verifica si el héroe ya ha sido eliminado
+      if (!heroActor || !heroCharacter) continue;
+
       const damage = currentMonsterCharacter.attack(heroCharacter);
+      currentMonster.graphics.use("attack");
+      setTimeout(() => {
+        currentMonster.graphics.use("idle");
+      }, 2000);
       const heroHealthBar = this.heroHealthBars[randomIndex];
       heroHealthBar.updateHealth(heroCharacter.health);
-      console.log(`${heroCharacter.name} being attacked`);
-      console.log(`Damage caused: ${damage}`);
+
+      if (this.heroCharacters[randomIndex]) {
+        const labelmessage = new Label({
+          font: new Font({
+            family: "PressStart2P",
+            size: 10,
+            unit: FontUnit.Px,
+            textAlign: TextAlign.Center,
+          }),
+          text: `${currentMonsterCharacter.name.replace(
+            "| Monster",
+            ""
+          )} Causó: ${damage} de daño a ${heroCharacter.name}`,
+          pos: vec(
+            this.engine.halfDrawWidth + 150,
+            this.engine.halfDrawWidth - 100 + posY
+          ),
+          color: Color.White,
+        });
+
+        this.add(labelmessage);
+
+        setTimeout(() => {
+          labelmessage.kill();
+        }, 3000);
+      }
+      posY += 25;
+
       if (heroCharacter.health < 1) {
-        if (heroHealthBar) {
-          heroHealthBar.kill();
-          this.remove(heroHealthBar);
-        }
-        heroActor.color = Color.Gray;
         heroActor.kill();
         heroHealthBar.kill();
-        if (heroActor.isKilled()) {
-          this.heroes.splice(randomIndex, 1);
-          this.heroCharacters.splice(randomIndex, 1);
-          this.heroHealthBars.splice(randomIndex, 1);
+        this.remove(heroActor);
+        this.remove(heroHealthBar);
+        this.heroes.splice(randomIndex, 1);
+        this.heroCharacters.splice(randomIndex, 1);
+        this.heroHealthBars.splice(randomIndex, 1);
 
-          if (currentMonsterCharacter instanceof Monster && !currentMonsterCharacter.hasDroppedWeapon && currentMonsterCharacter.hasWeapon()) {
-          
-            console.log(` ****${currentMonsterCharacter.name} dropped a weapon...`);
-            const weapon = currentMonsterCharacter.dropWeapon();
-          
-            // Get an array of all monsters except the one that dropped the weapon
-            const monstersExceptCurrent = this.monsterCharacters.filter(monster => monster !== currentMonsterCharacter);
-            const heroWarriors = this.heroCharacters.filter(character => Warrior);
-            const poolDrop = Array.prototype.concat(monstersExceptCurrent, heroWarriors);
-            // If there are monsters left, select a random monster to receive the weapon
-            if (poolDrop.length > 0) {
-              let randomIndex = Math.floor(Math.random() * poolDrop.length);
-              let characterToReceiveWeapon = poolDrop[randomIndex];
-              characterToReceiveWeapon.pickWeapon(weapon);
-              console.log(`weapon with ${weapon?.damage} damage dropped and given to ${characterToReceiveWeapon.name}...`);
-            }
+        if (
+          currentMonsterCharacter instanceof Monster &&
+          !currentMonsterCharacter.hasDroppedWeapon &&
+          currentMonsterCharacter.hasWeapon()
+        ) {
+          console.log(
+            ` ****${currentMonsterCharacter.name} dropped a weapon...`
+          );
+          const weapon = currentMonsterCharacter.dropWeapon();
+
+          // Get an array of all monsters except the one that dropped the weapon
+          const monstersExceptCurrent = this.monsterCharacters.filter(
+            (monster) => monster !== currentMonsterCharacter
+          );
+          const heroWarriors = this.heroCharacters.filter(
+            (character) => character instanceof Warrior
+          );
+          const poolDrop = monstersExceptCurrent.concat(heroWarriors);
+          // If there are characters left, select a random one to receive the weapon
+          if (poolDrop.length > 0 && weapon !== undefined) {
+            let randomDropIndex = Math.floor(Math.random() * poolDrop.length);
+            let characterToReceiveWeapon = poolDrop[randomDropIndex];
+            characterToReceiveWeapon.pickWeapon(weapon);
+            const labelWeapons = new Label({
+              font: new Font({
+                family: "PressStart2P",
+                size: 10,
+                unit: FontUnit.Px,
+                textAlign: TextAlign.Center,
+              }),
+              text: `Weapon with ${weapon?.damage} damage dropped and given to ${characterToReceiveWeapon.name}`,
+              pos: vec(
+                this.engine.halfDrawWidth,
+                this.engine.halfDrawWidth + 200
+              ),
+              color: Color.White,
+            });
+            this.add(labelWeapons);
+            setTimeout(() => {
+              labelWeapons.kill();
+            }, 3000);
           }
         }
-      }
-    });
 
-    // Verifica si este era el último monstruo
-    if (this.heroCharacters.length === 0) {
-      // Maneja el caso de que todos los monstruos han sido derrotados
-      this.checkGameOver();
-      // No continúes con el cambio de turno o programar ataques si el juego ha terminado
-      return;
+        // Si se eliminó un héroe, ajusta el índice si es necesario
+        index = index > 0 ? index - 1 : 0;
+
+        // Verifica si este era el último héroe
+        if (this.heroCharacters.length === 0) {
+          this.checkGameOver();
+          break; // Sal del bucle si todos los héroes han sido derrotados
+        }
+      }
     }
+
     this.changeTurn();
   }
 
-  showWeapon() {
-    this.heroCharacters.map((currentHero, index) => {
-      const heroActor = this.heroes[index];
+  // showWeapon() {
+  //   this.heroCharacters.map((currentHero, index) => {
+  //     const heroActor = this.heroes[index];
 
-      if (currentHero.hasWeapon()) {
-        heroActor.color = Color.fromHex("fa7c5f");
-        console.log(`${currentHero.name} has a Weapon `);
-      }
-      console.log(`and ${currentHero.health} of Health `);
-    });
-    this.monsterCharacters.map((currentMonster, index) => {
-      const monsterActor = this.monsters[index];
-      if (currentMonster.hasWeapon()) {
-        monsterActor.color = Color.fromHex("9cff86");
-        console.log(`${currentMonster.name} has a Weapon `);
-      }
-      console.log(`and ${currentMonster.health} of Health `);
-    });
-  }
+  //     if (currentHero.hasWeapon()) {
+  //       const label = new Label({
+  //         text: `${currentHero.name} Has Weapon`,
+  //         color: Color.White,
+  //         pos: vec(heroActor.pos.x, this.engine.halfDrawHeight - 50),
+  //         font: new Font({
+  //           family: "PressStart2P",
+  //           size: 10,
+  //           unit: FontUnit.Px,
+  //           textAlign: TextAlign.Center,
+  //         }),
+  //       });
+  //       this.add(label);
+  //       setTimeout(() => {
+  //         label.kill();
+  //       }, 3000);
+  //     } else {
+  //       const label = new Label({
+  //         text: `${currentHero.name}`,
+  //         color: Color.White,
+  //         pos: vec(heroActor.pos.x, heroActor.pos.y + 50),
+  //         font: new Font({
+  //           family: "PressStart2P",
+  //           size: 10,
+  //           unit: FontUnit.Px,
+  //           textAlign: TextAlign.Center,
+  //         }),
+  //       });
+  //       setTimeout(() => {
+  //         label.kill();
+  //       }, 3000);
+  //     }
+  //   });
+
+  //   this.monsterCharacters.map((currentMonster, index) => {
+  //     const monsterActor = this.monsters[index];
+  //     if (currentMonster.hasWeapon()) {
+  //       const label = new Label({
+  //         text: `${currentMonster.name.replace("| Monster", "")} Has Weapon`,
+  //         color: Color.White,
+  //         pos: vec(monsterActor.pos.x, monsterActor.pos.y + 50),
+  //         font: new Font({
+  //           family: "PressStart2P",
+  //           size: 10,
+  //           unit: FontUnit.Px,
+  //           textAlign: TextAlign.Center,
+  //         }),
+  //       });
+  //       this.add(label);
+  //       setTimeout(() => {
+  //         label.kill();
+  //       }, 3000);
+  //     } else {
+  //       const label = new Label({
+  //         text: `${currentMonster.name.replace("| Monster", "")}`,
+  //         color: Color.White,
+  //         pos: vec(monsterActor.pos.x, monsterActor.pos.y - 50),
+  //         font: new Font({
+  //           family: "PressStart2P",
+  //           size: 10,
+  //           unit: FontUnit.Px,
+  //           textAlign: TextAlign.Center,
+  //         }),
+  //       });
+  //       this.add(label);
+
+  //       setTimeout(() => {
+  //         label.kill();
+  //       }, 3000);
+  //     }
+  //   });
+  // }
 }

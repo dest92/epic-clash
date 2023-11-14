@@ -10,6 +10,7 @@ import {
   Actor,
   Sound,
   SceneActivationContext,
+  Loader,
 } from "excalibur";
 import { Images, loader } from "./resources";
 import { backgroundSounds } from "./MainMenu";
@@ -28,9 +29,9 @@ export class GameOverScene extends Scene {
 
     background.graphics.use(Images.gameOverImage.toSprite());
 
-    loader.addResource(gameOverSound);
+    const soundLoader = new Loader([gameOverSound]);
 
-    engine.start(loader);
+    engine.start(soundLoader);
 
     if (gameOverSound.isLoaded()) {
       gameOverSound.play();

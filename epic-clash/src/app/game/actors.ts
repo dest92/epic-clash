@@ -1,3 +1,4 @@
+import { Actor, Color, Vector } from "excalibur";
 import {
   IWeapon,
   Weapon,
@@ -59,7 +60,7 @@ const names: Record<CharacterType, string[]> = {
 };
 
 // Función para generar un número aleatorio entre min y max
-function getRandomInt(min: number, max: number): number {
+export function getRandomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
@@ -72,7 +73,7 @@ export function getRandomName(type: CharacterType): string {
 }
 
 // Función para determinar si un personaje tiene un arma
-function hasWeapon(): boolean {
+export function hasWeapon(): boolean {
   return Math.random() < 0.8; // 80% de probabilidad de tener un arma
 }
 
@@ -105,3 +106,5 @@ export function createCharacters(
 
   return characters;
 }
+
+
