@@ -414,6 +414,31 @@ export class GameScene extends Scene {
       if (monsterCharacter.health <= 0) {
         monsterActor.kill();
         monsterHealthBar.kill();
+        if (monsterCharacter.hasWeapon()) {
+          const droppedWeapon = monsterCharacter.weapon;
+          let heroToEquipWeapon = this.findHeroToEquipWeapon();
+          if (heroToEquipWeapon !== undefined && droppedWeapon !== undefined) {
+            heroToEquipWeapon.pickWeapon(droppedWeapon);
+            const weaponPicked = new Label({
+              font: new Font({
+                family: "PressStart2P",
+                size: 10,
+                unit: FontUnit.Px,
+                textAlign: TextAlign.Center,
+              }),
+              text: `Weapon with ${droppedWeapon?.damage} damage picked up by ${heroToEquipWeapon.name}`,
+              pos: vec(
+                this.engine.halfDrawWidth,
+                this.engine.halfDrawWidth + 220
+              ),
+              color: Color.White,
+            });
+            this.add(weaponPicked);
+            setTimeout(() => {
+              weaponPicked.kill();
+            }, 3000);
+          }
+        }
         this.remove(monsterActor);
         this.remove(monsterHealthBar);
         this.monsters.splice(randomIndex, 1);
@@ -469,24 +494,6 @@ export class GameScene extends Scene {
             console.log(
               `Weapon with ${weapon?.damage} damage picked up by ${heroToReceiveWeapon.name}...`
             );
-            const weaponPicked = new Label({
-              font: new Font({
-                family: "PressStart2P",
-                size: 10,
-                unit: FontUnit.Px,
-                textAlign: TextAlign.Center,
-              }),
-              text: `Weapon with ${weapon?.damage} damage picked up by ${heroToReceiveWeapon.name}...`,
-              pos: vec(
-                this.engine.halfDrawWidth,
-                this.engine.halfDrawWidth + 220
-              ),
-              color: Color.White,
-            });
-            this.add(weaponPicked);
-            setTimeout(() => {
-              weaponPicked.kill();
-            }, 3000);
           }
         }
 
@@ -505,6 +512,12 @@ export class GameScene extends Scene {
     this.scheduleMonsterAttack();
   }
 
+  findHeroToEquipWeapon() {
+    return (
+      this.heroCharacters.find((hero) => !hero.hasWeapon()) ||
+      this.heroCharacters[0]
+    );
+  }
   performMonsterAttack() {
     console.log("-----Monster turn-----");
 
@@ -521,8 +534,6 @@ export class GameScene extends Scene {
         this.checkGameOver();
         break; // Sal del bucle si no hay héroes
       }
-
-      console.log(`->${currentMonsterCharacter.name} is attacking...`);
 
       // Genera un índice aleatorio para seleccionar un héroe al azar
       const randomIndex = Math.floor(Math.random() * this.heroes.length);
@@ -595,7 +606,7 @@ export class GameScene extends Scene {
           );
           const poolDrop = monstersExceptCurrent.concat(heroWarriors);
           // If there are characters left, select a random one to receive the weapon
-          if (poolDrop.length > 0) {
+          if (poolDrop.length > 0 && weapon !== undefined) {
             let randomDropIndex = Math.floor(Math.random() * poolDrop.length);
             let characterToReceiveWeapon = poolDrop[randomDropIndex];
             characterToReceiveWeapon.pickWeapon(weapon);
