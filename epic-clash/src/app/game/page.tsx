@@ -1,34 +1,49 @@
 "use client";
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
+import Layout from "../components/layout";
 import { Engine } from "excalibur";
-import { initializeGame, startGame } from "./game";
 
-export const GamePage = () => {
+export default function GamePage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const gameRef = useRef<Engine | null>(null);
-
-  const resetGame = () => {
-    if (gameRef.current) {
-      gameRef.current.stop();
-    }
-    // Aquí deberías agregar la función cleanUpPlayButtons si es necesario
-  };
+  const [gameInstance, setGameInstance] = useState<Engine | null>(null);
 
   useEffect(() => {
-    // HMR support
-    resetGame();
+    let isMounted = true; // Esta bandera determina si el componente está montado
 
-    // Verifica si el elemento canvas existe
-    if (canvasRef.current) {
-      // Inicializa y ejecuta el juego
-      gameRef.current = initializeGame(canvasRef.current);
-      startGame(gameRef.current);
+    if (canvasRef.current && !gameInstance) {
+      // Importa dinámicamente las funciones de inicialización y arranque del juego
+      import("./main").then(({ initializeGame, startGame }) => {
+        if (isMounted) {
+          // Solo procede si el componente sigue montado
+          const engine = initializeGame(canvasRef.current!);
+          setGameInstance(engine); // Guarda la instancia del juego en el estado
+          startGame(engine);
+        }
+      });
     }
 
-    return resetGame;
-  }, []);
+    // Función de limpieza para cuando el componente se desmonte
+    return () => {
+      isMounted = false; // Indica que el componente se ha desmontado
+      if (gameInstance) {
+        // Detén el juego y realiza cualquier limpieza necesaria
+        gameInstance.stop();
+        setGameInstance(null); // Limpia la instancia del juego
+      }
+    };
+  }, [gameInstance]); // Dependencia: solo re-ejecuta este efecto si gameInstance cambia
 
-  return <canvas ref={canvasRef}></canvas>;
-};
-
-export default GamePage;
+  return (
+    <>
+      <div className="fondo-about">
+        <Layout home title>
+          <div className="flex justify-center items-center h-screen">
+            <div className="border-8 border-stone-900">
+              <canvas ref={canvasRef} className="m-auto" />
+            </div>
+          </div>
+        </Layout>
+      </div>
+    </>
+  );
+}

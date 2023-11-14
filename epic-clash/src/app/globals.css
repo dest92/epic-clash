@@ -16,7 +16,31 @@
   }
 }
 
+@font-face {
+  font-family: "PressStart2P";
+  src: url("assets/fonts/PressStart2P-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+.fondo-juego {
+  background-image: url("assets/images/background.png");
+  background-size: cover;
+  background-position: center;
+}
+
+.fondo-about {
+  background-image: url("assets/images/aboutBackground.png");
+  background-size: cover;
+  background-position: center;
+}
+
+.font-8bit {
+  font-family: "PressStart2P", cursive;
+}
+
 body {
   color: rgb(var(--foreground-rgb));
   background: white;
+  font-family: "PressStart2P", cursive;
 }
