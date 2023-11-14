@@ -312,8 +312,6 @@ export class GameScene extends Scene {
       this.currentActor = this.heroes[0]; // Start with the first hero
     });
 
-    this.showWeapon();
-
     this.add(attackButton);
     this.add(changeHeroButton);
     this.add(labelAttack);
@@ -610,9 +608,24 @@ export class GameScene extends Scene {
             let randomDropIndex = Math.floor(Math.random() * poolDrop.length);
             let characterToReceiveWeapon = poolDrop[randomDropIndex];
             characterToReceiveWeapon.pickWeapon(weapon);
-            console.log(
-              `Weapon with ${weapon?.damage} damage dropped and given to ${characterToReceiveWeapon.name}...`
-            );
+            const labelWeapons = new Label({
+              font: new Font({
+                family: "PressStart2P",
+                size: 10,
+                unit: FontUnit.Px,
+                textAlign: TextAlign.Center,
+              }),
+              text: `Weapon with ${weapon?.damage} damage dropped and given to ${characterToReceiveWeapon.name}`,
+              pos: vec(
+                this.engine.halfDrawWidth,
+                this.engine.halfDrawWidth + 200
+              ),
+              color: Color.White,
+            });
+            this.add(labelWeapons);
+            setTimeout(() => {
+              labelWeapons.kill();
+            }, 3000);
           }
         }
 
@@ -630,23 +643,80 @@ export class GameScene extends Scene {
     this.changeTurn();
   }
 
-  showWeapon() {
-    this.heroCharacters.map((currentHero, index) => {
-      const heroActor = this.heroes[index];
+  // showWeapon() {
+  //   this.heroCharacters.map((currentHero, index) => {
+  //     const heroActor = this.heroes[index];
 
-      if (currentHero.hasWeapon()) {
-        heroActor.color = Color.fromHex("fa7c5f");
-        console.log(`${currentHero.name} has a Weapon `);
-      }
-      console.log(`and ${currentHero.health} of Health `);
-    });
-    this.monsterCharacters.map((currentMonster, index) => {
-      const monsterActor = this.monsters[index];
-      if (currentMonster.hasWeapon()) {
-        monsterActor.color = Color.fromHex("9cff86");
-        console.log(`${currentMonster.name} has a Weapon `);
-      }
-      console.log(`and ${currentMonster.health} of Health `);
-    });
-  }
+  //     if (currentHero.hasWeapon()) {
+  //       const label = new Label({
+  //         text: `${currentHero.name} Has Weapon`,
+  //         color: Color.White,
+  //         pos: vec(heroActor.pos.x, this.engine.halfDrawHeight - 50),
+  //         font: new Font({
+  //           family: "PressStart2P",
+  //           size: 10,
+  //           unit: FontUnit.Px,
+  //           textAlign: TextAlign.Center,
+  //         }),
+  //       });
+  //       this.add(label);
+  //       setTimeout(() => {
+  //         label.kill();
+  //       }, 3000);
+  //     } else {
+  //       const label = new Label({
+  //         text: `${currentHero.name}`,
+  //         color: Color.White,
+  //         pos: vec(heroActor.pos.x, heroActor.pos.y + 50),
+  //         font: new Font({
+  //           family: "PressStart2P",
+  //           size: 10,
+  //           unit: FontUnit.Px,
+  //           textAlign: TextAlign.Center,
+  //         }),
+  //       });
+  //       setTimeout(() => {
+  //         label.kill();
+  //       }, 3000);
+  //     }
+  //   });
+
+  //   this.monsterCharacters.map((currentMonster, index) => {
+  //     const monsterActor = this.monsters[index];
+  //     if (currentMonster.hasWeapon()) {
+  //       const label = new Label({
+  //         text: `${currentMonster.name.replace("| Monster", "")} Has Weapon`,
+  //         color: Color.White,
+  //         pos: vec(monsterActor.pos.x, monsterActor.pos.y + 50),
+  //         font: new Font({
+  //           family: "PressStart2P",
+  //           size: 10,
+  //           unit: FontUnit.Px,
+  //           textAlign: TextAlign.Center,
+  //         }),
+  //       });
+  //       this.add(label);
+  //       setTimeout(() => {
+  //         label.kill();
+  //       }, 3000);
+  //     } else {
+  //       const label = new Label({
+  //         text: `${currentMonster.name.replace("| Monster", "")}`,
+  //         color: Color.White,
+  //         pos: vec(monsterActor.pos.x, monsterActor.pos.y - 50),
+  //         font: new Font({
+  //           family: "PressStart2P",
+  //           size: 10,
+  //           unit: FontUnit.Px,
+  //           textAlign: TextAlign.Center,
+  //         }),
+  //       });
+  //       this.add(label);
+
+  //       setTimeout(() => {
+  //         label.kill();
+  //       }, 3000);
+  //     }
+  //   });
+  // }
 }

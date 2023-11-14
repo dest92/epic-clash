@@ -83,8 +83,25 @@ export class MainMenuScene extends Scene {
       engine.goToScene("howToPlay");
     });
 
-    this.add(background);
-    this.add(playButton);
-    this.add(howToPlayButton);
+    const loading = new Label({
+      text: "Loading...",
+      pos: vec(engine.halfDrawWidth - 120, engine.halfDrawHeight),
+      color: Color.White,
+      font: new Font({
+        size: 30,
+        unit: FontUnit.Px,
+        family: "PressStart2P",
+      }),
+    });
+
+
+    this.add(loading);
+
+    setTimeout(() => {
+      loading.kill();
+      this.add(background);
+      this.add(playButton);
+      this.add(howToPlayButton);
+    }, 5000);
   }
 }
