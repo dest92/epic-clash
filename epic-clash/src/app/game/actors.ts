@@ -99,7 +99,7 @@ export function createCharacters(
   // Crear monstruos
   for (let i = 0; i < numMonsters; i++) {
     const health = getRandomInt(20, 100); // Salud aleatoria entre 20 y 100
-    const weapon = hasWeapon() ? new Weapon(getRandomInt(1, 10)) : undefined; // Arma aleatoria o ninguna
+    const weapon = hasWeapon() ? new Weapon(getRandomInt(1, 20)) : undefined; // Arma aleatoria o ninguna
     const name = getRandomName("monster");
     characters.push(new Monster(name, health, weapon));
   }
