@@ -11,6 +11,7 @@ import {
   Label,
   SceneActivationContext,
   Vector,
+  BaseAlign,
 } from "excalibur";
 import { Warrior, Mage, Monster, Weapon, ICharacter } from "./characters";
 import { Images, Warriors, loader, Monsters } from "./resources";
@@ -37,6 +38,7 @@ export class GameScene extends Scene {
   private changeHeroType() {
     // Obtén el héroe actual y su barra de salud
     let currentHero = this.heroCharacters[this.currentHeroIndex];
+    let currentActor = this.heroes[this.currentHeroIndex];
     console.log(`currentHero: ${currentHero.name}`);
     // Determina el nuevo tipo de héroe
     let newHeroType = currentHero instanceof Warrior ? Mage : Warrior;
@@ -48,6 +50,12 @@ export class GameScene extends Scene {
       isMage = true;
     } else {
       isMage = false;
+      const graphic = Warriors.warrior;
+      graphic.width = 300;
+      graphic.height = 300;
+      currentActor.scale = new Vector(2, 2);
+      currentActor.graphics.use(graphic.toAnimation(100));
+      currentActor.graphics.add("warrior", graphic.toAnimation(100));
     }
     newHero.name = getRandomName(isMage ? "wizard" : "warrior");
     newHero.health = currentHero.health;
@@ -138,7 +146,6 @@ export class GameScene extends Scene {
 
     background.graphics.use(Images.inGame.toSprite());
 
-    engine.start(loader);
     this.add(background);
     const characters = createCharacters(2, 3);
     const attackButton = new Actor({
@@ -158,6 +165,13 @@ export class GameScene extends Scene {
 
     attackButton.on("pointerup", () => {
       this.performHeroAttack();
+      attackButton.kill();
+      labelAttack.kill();
+      setTimeout(() => {
+        this.add(attackButton);
+        attackButton.color = Color.Red;
+        this.add(labelAttack);
+      }, 3200);
     });
 
     const labelAttack = new Label({
@@ -339,8 +353,7 @@ export class GameScene extends Scene {
     }, 3000); // Espera 3 segundos antes de que el monstruo ataque
   }
   performHeroAttack() {
-    console.log("-----Heroes turn-----");
-
+    let posY = 0;
     // Utiliza un bucle for en lugar de map para poder salir del bucle si es necesario
     for (let index = 0; index < this.heroes.length; index++) {
       const currentHero = this.heroes[index];
@@ -352,8 +365,6 @@ export class GameScene extends Scene {
         this.checkGameOver();
         break; // Sal del bucle si no hay monstruos
       }
-
-      console.log(`-> ${currentHeroCharacter.name} is attacking...`);
 
       // Genera un índice aleatorio para seleccionar un monstruo al azar
       const randomIndex = Math.floor(Math.random() * this.monsters.length);
@@ -370,13 +381,24 @@ export class GameScene extends Scene {
           font: new Font({
             family: "PressStart2P",
             size: 10,
+            baseAlign: BaseAlign.Middle,
+            padding: 10,
             unit: FontUnit.Px,
             textAlign: TextAlign.Center,
           }),
-          text: `Causó: ${damage} de daño a ${monsterCharacter.name}`,
-          pos: vec(currentHero.pos.x, currentHero.pos.y - getRandomInt(0, 50)),
+          text: `${
+            currentHeroCharacter.name
+          } Causó: ${damage} de daño a ${monsterCharacter.name.replace(
+            "| Monster",
+            " "
+          )}`,
+          pos: vec(
+            this.engine.halfDrawWidth - 150,
+            currentHero.pos.y - 200 + posY
+          ),
           color: Color.White,
         });
+        posY += 25;
 
         this.add(labelmessage);
 
@@ -390,7 +412,6 @@ export class GameScene extends Scene {
       monsterHealthBar.updateHealth(monsterCharacter.health);
 
       if (monsterCharacter.health <= 0) {
-        console.log(`${monsterCharacter.name} has been defeated.`);
         monsterActor.kill();
         monsterHealthBar.kill();
         this.remove(monsterActor);
@@ -408,6 +429,28 @@ export class GameScene extends Scene {
           console.log(
             ` *********${currentHeroCharacter.name} dropped a weapon...`
           );
+
+          const labelWeapons = new Label({
+            font: new Font({
+              family: "PressStart2P",
+              size: 10,
+              unit: FontUnit.Px,
+              textAlign: TextAlign.Center,
+            }),
+            text: `${currentHeroCharacter.name} dropped a weapon...`,
+            pos: vec(
+              this.engine.halfDrawWidth,
+              this.engine.halfDrawWidth + 200
+            ),
+            color: Color.White,
+          });
+
+          this.add(labelWeapons);
+
+          setTimeout(() => {
+            labelWeapons.kill();
+          }, 3000);
+
           const weapon = currentHeroCharacter.dropWeapon();
           console.log(` weapon with ${weapon?.damage} damage dropped...`);
 
@@ -417,7 +460,7 @@ export class GameScene extends Scene {
           );
 
           // Si hay otros héroes, selecciona uno al azar para recibir el arma
-          if (heroesExceptCurrent.length > 0) {
+          if (heroesExceptCurrent.length > 0 && weapon !== undefined) {
             let randomHeroIndex = Math.floor(
               Math.random() * heroesExceptCurrent.length
             );
@@ -426,6 +469,24 @@ export class GameScene extends Scene {
             console.log(
               `Weapon with ${weapon?.damage} damage picked up by ${heroToReceiveWeapon.name}...`
             );
+            const weaponPicked = new Label({
+              font: new Font({
+                family: "PressStart2P",
+                size: 10,
+                unit: FontUnit.Px,
+                textAlign: TextAlign.Center,
+              }),
+              text: `Weapon with ${weapon?.damage} damage picked up by ${heroToReceiveWeapon.name}...`,
+              pos: vec(
+                this.engine.halfDrawWidth,
+                this.engine.halfDrawWidth + 220
+              ),
+              color: Color.White,
+            });
+            this.add(weaponPicked);
+            setTimeout(() => {
+              weaponPicked.kill();
+            }, 3000);
           }
         }
 
@@ -475,7 +536,7 @@ export class GameScene extends Scene {
       currentMonster.graphics.use("attack");
       setTimeout(() => {
         currentMonster.graphics.use("idle");
-      }, 1000);
+      }, 2000);
       const heroHealthBar = this.heroHealthBars[randomIndex];
       heroHealthBar.updateHealth(heroCharacter.health);
 
@@ -487,8 +548,14 @@ export class GameScene extends Scene {
             unit: FontUnit.Px,
             textAlign: TextAlign.Center,
           }),
-          text: `Causó: ${damage} de daño a ${heroCharacter.name}`,
-          pos: vec(currentMonster.pos.x, currentMonster.pos.y - posY),
+          text: `${currentMonsterCharacter.name.replace(
+            "| Monster",
+            ""
+          )} Causó: ${damage} de daño a ${heroCharacter.name}`,
+          pos: vec(
+            this.engine.halfDrawWidth + 150,
+            this.engine.halfDrawWidth - 100 + posY
+          ),
           color: Color.White,
         });
 
@@ -498,10 +565,9 @@ export class GameScene extends Scene {
           labelmessage.kill();
         }, 3000);
       }
-      posY += 50;
+      posY += 25;
 
       if (heroCharacter.health < 1) {
-        console.log(`${heroCharacter.name} has been defeated.`);
         heroActor.kill();
         heroHealthBar.kill();
         this.remove(heroActor);
