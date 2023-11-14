@@ -1,16 +1,5 @@
-import {
-  Scene,
-  Engine,
-  Color,
-  Label,
-  Font,
-  TextAlign,
-  vec,
-  FontUnit,
-  Actor,
-  Sound,
-} from "excalibur";
-import { Images, loader } from "./resources";
+import { Scene, Engine, Color, vec, Actor } from "excalibur";
+import { Images } from "./resources";
 
 export class HowToPlayScene extends Scene {
   onInitialize(engine: Engine) {
@@ -21,8 +10,6 @@ export class HowToPlayScene extends Scene {
     });
 
     background.graphics.use(Images.howToPlay.toSprite());
-
-    engine.start(loader);
 
     // Crear un label para el mensaje de Game Over
 
