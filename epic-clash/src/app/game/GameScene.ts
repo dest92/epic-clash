@@ -539,10 +539,11 @@ export class GameScene extends Scene {
         if (monsterCharacter.hasWeapon()) {
           const droppedWeapon = monsterCharacter.weapon;
           let heroToEquipWeapon = this.findHeroToEquipWeapon();
-          let damage = heroToEquipWeapon.weapon?.damage ?? 0;
+          let damage = heroToEquipWeapon?.weapon?.damage ?? 0;
           if (
             droppedWeapon !== undefined &&
-            heroToEquipWeapon instanceof Warrior && (damage < droppedWeapon.damage)
+            heroToEquipWeapon instanceof Warrior &&
+            damage < droppedWeapon.damage
           ) {
             heroToEquipWeapon.pickWeapon(droppedWeapon);
             const weaponPicked = new Label({
@@ -643,10 +644,7 @@ export class GameScene extends Scene {
   }
 
   findHeroToEquipWeapon() {
-    return (
-      this.heroCharacters.find((hero) => !hero.hasWeapon()) ||
-      this.heroCharacters[0]
-    );
+    return this.heroCharacters.find((hero) => hero instanceof Warrior );
   }
 
   findMonsterToEquipWeapon() {
