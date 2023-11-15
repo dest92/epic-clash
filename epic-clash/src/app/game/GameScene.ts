@@ -602,30 +602,6 @@ export class GameScene extends Scene {
           setTimeout(() => {
             labelWeapons.kill();
           }, 3000);
-
-          const weapon = currentHeroCharacter.dropWeapon();
-          console.log(` weapon with ${weapon?.damage} damage dropped...`);
-
-          // Obtén un array de todos los héroes excepto el que soltó el arma
-          const heroesExceptCurrent = this.heroCharacters.filter(
-            (hero) => hero !== currentHeroCharacter
-          );
-
-          // Si hay otros héroes, selecciona uno al azar para recibir el arma
-          if (
-            heroesExceptCurrent.length > 0 &&
-            weapon !== undefined &&
-            weapon.damage > 0
-          ) {
-            let randomHeroIndex = Math.floor(
-              Math.random() * heroesExceptCurrent.length
-            );
-            let heroToReceiveWeapon = heroesExceptCurrent[randomHeroIndex];
-            heroToReceiveWeapon.pickWeapon(weapon);
-            console.log(
-              `Weapon with ${weapon?.damage} damage picked up by ${heroToReceiveWeapon.name}...`
-            );
-          }
         }
 
         // Si se eliminó un monstruo, ajusta el índice si es necesario
@@ -644,7 +620,7 @@ export class GameScene extends Scene {
   }
 
   findHeroToEquipWeapon() {
-    return this.heroCharacters.find((hero) => hero instanceof Warrior );
+    return this.heroCharacters.find((hero) => hero instanceof Warrior);
   }
 
   findMonsterToEquipWeapon() {
