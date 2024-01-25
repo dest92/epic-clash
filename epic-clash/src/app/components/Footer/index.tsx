@@ -10,7 +10,7 @@ const Footer = () => {
           © 2023 Total Games. Todos los derechos reservados.
         </p>
         <p className="mt-4">
-          Hecho por Matías Acebal, Matías Gutierrez y Bruno Barraud
+          Hecho por Matías Acebal
         </p>
        
       </div>
