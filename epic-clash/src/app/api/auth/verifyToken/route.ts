@@ -37,6 +37,11 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     // Token no válido o error en la verificación
+    //delete cookie
+
+    const headers = new Headers();
+    headers.append("Set-Cookie", `token=; Path=/; HttpOnly; Max-Age=0`);
+
     return new Response(
       JSON.stringify({ valid: false, message: "Invalid token" }),
       {

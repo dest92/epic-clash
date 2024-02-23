@@ -35,6 +35,12 @@
   background-position: center;
 }
 
+.fondo-login {
+  background-image: url("assets/images/loginfondo.webp");
+  background-size: cover;
+  background-position: center;
+}
+
 .font-8bit {
   font-family: "PressStart2P", cursive;
 }
