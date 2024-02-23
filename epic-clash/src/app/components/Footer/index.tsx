@@ -1,3 +1,4 @@
+import Link from "next/link";
 
 const Footer = () => {
   return (
@@ -9,10 +10,12 @@ const Footer = () => {
         <p className="mt-4">
           © 2023 Total Games. Todos los derechos reservados.
         </p>
+        <p className="mt-4">Hecho por Matías Acebal</p>
         <p className="mt-4">
-          Hecho por Matías Acebal
+          <Link href="/about" className="hover:text-green-400 mx-2">
+            Sobre nosotros
+          </Link>
         </p>
-       
       </div>
     </footer>
   );

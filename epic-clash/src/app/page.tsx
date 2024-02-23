@@ -7,7 +7,7 @@ export const metadata = {
 export default function Home() {
   return (
     <>
-      <Layout about={true}>
+      <Layout>
         <div className="fondo-juego min-h-screen flex justify-center items-center">
           <div className="bg-transparent min-h-screen flex justify-center items-center">
             <div className="text-center p-5 bg-black bg-opacity-50 rounded-lg">
