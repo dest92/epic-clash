@@ -1,5 +1,6 @@
 "use client";
 import { useState, FormEvent } from "react";
+import { toast } from "sonner";
 
 // Definición de interfaces para los estados y el evento de formulario
 interface LoginFormState {
@@ -59,6 +60,7 @@ export default function LoginForm() {
       });
 
       if (res.status === 200) {
+        toast.success("¡Bienvenido! Redirigiendo...");
         setTimeout(() => {
           window.location.href = "/";
         }, 3000);
@@ -70,6 +72,7 @@ export default function LoginForm() {
           loading: false,
           error: data.message || "Error al iniciar sesión.",
         }));
+        toast.error(data.message || "Error al iniciar sesión.");
       }
 
       //   setTimeout(
